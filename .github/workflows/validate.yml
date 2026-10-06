@@ -1,0 +1,50 @@
+name: Validate Harness
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate-plans:
+    name: Validate Plan Structure
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run validate-plans.ps1
+        shell: pwsh
+        run: |
+          ./scripts/validate-plans.ps1
+
+  test-installer:
+    name: Test Installers
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Test Python Installer
+        run: |
+          python install.py --target ./test_project --agent all
+          python install.py --target ./test_project --force
+
+      - name: Verify Installed Structure
+        shell: bash
+        run: |
+          test -f ./test_project/AGENTS.md
+          test -f ./test_project/docs/WORKFLOW.md
+          test -f ./test_project/docs/plans/system-roadmap.md
+          test -f ./test_project/docs/plans/contract-registry.md
+          test -f ./test_project/scripts/validate-plans.ps1
+          echo "Installation verified successfully on ${{ matrix.os }}!"
