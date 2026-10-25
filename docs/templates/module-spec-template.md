@@ -6,6 +6,7 @@
 > **Root SPEC Authority:** `SPEC.md` (§...)  
 > **Project Roadmap:** `docs/plans/system-roadmap.md#2-module-registry`  
 > **Contract Registry:** `docs/plans/contract-registry.md`  
+> **UI Prototype Registry:** `docs/prototypes/registry.md` (`UI Module: YES | NO`)  
 > **Skill Map Reference:** `ai-skill-maps.md`  
 > **Status:** PLANNED | SPEC_REVIEW | READY | IN_PROGRESS | COMPLETED  
 > **Last Updated:** YYYY-MM-DD HH:MM  
@@ -81,6 +82,13 @@ flowchart TD
 ### 5.3 Input / Output Validation & Payload Rules
 - **Request / Event Schemas:**
 - **Idempotency & Concurrency Rules (e.g., Fencing Tokens / Unique Keys):**
+
+### 5.4 UI Screen & Prototype Mapping (For UI / Frontend Modules Only)
+*(If this is a headless/backend module, write `N/A — Headless Backend Module`. If this is a UI module, every screen MUST map to an `APPROVED` prototype in `docs/prototypes/registry.md`, and Gate 5 components MUST port its DOM, classes, states, and `data-testid` anchors 1:1.)*
+
+| Screen ID | Screen Name | Approved Prototype Path | Consumed Contracts | Required UI States & `data-testid` Anchors |
+| :--- | :--- | :--- | :--- | :--- |
+| `SCR-<MOD>-01` | ... | `docs/prototypes/<module-slug>/scr-01-....html` | `CT-<OTHER>-01` | `default, loading, empty, error`; `data-testid="scr-01-..."` |
 
 ---
 

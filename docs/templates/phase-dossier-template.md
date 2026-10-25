@@ -26,6 +26,7 @@
 ## 1. Phase Architecture & Boundary Check
 - **Phase Objective:**
 - **Detailed Module Spec Section Reference:** `docs/modules-spec/<module-slug>.md` (§...)
+- **Approved UI Prototypes Mapped to this Phase (if UI module):** `SCR-<MOD>-01` (`docs/prototypes/<module-slug>/scr-01-....html`) *(or `N/A — Non-UI Phase`)*
 - **Mandatory Skills Read Before Execution:** `.agents/skills/atomic-harness-gatekeeper/SKILL.md`, `...`
 - **Module Code Root (Single-Module Scope):** `services/<module-slug>/`
 - **Boundary with other Phases of this Module (preventing regressions):**
@@ -73,6 +74,7 @@
 - **Objective:**
 - **Target Files:** `services/<module-slug>/src/...`
 - **Contracts Touched:** `CT-<MOD>-01` (or none)
+- **UI Prototype Reference (Strict 1:1 Parity if UI task):** `SCR-<MOD>-01` (`docs/prototypes/<module-slug>/scr-01-....html`) — MUST read file & port 1:1 DOM, classes, states (`default`/`loading`/`empty`/`error`), and `data-testid` anchors (or `none`)
 - **Executable Proof Command:** `npm test` or `pytest tests/...`
 - **Acceptance Criteria (from `docs/modules-spec/<module-slug>.md`):**
 

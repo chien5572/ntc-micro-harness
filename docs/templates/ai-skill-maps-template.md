@@ -48,12 +48,17 @@ All approved project skills are installed locally under `.agents/skills/`:
   - At the start of every session or when receiving `"tiếp tục"`, `"tiếp tục <MOD>"`, or `"tiếp tục phase <MOD>-P<NN>"`.
   - During Gate 4 (Phase Dossier WBS generation) and Gate 5 (Atomic Task implementation).
   - Before concluding any turn to update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix`.
-- **Core Enforcement:** Locks `1 Turn = 1 Atomic Task`, `Contract-First`, `No-Stubbing`, 3-Step Crash Recovery, and the Phase Boundary Hard Stop on `"tiếp tục"`.
+- **Core Enforcement:** Locks `1 Turn = 1 Atomic Task`, `Contract-First`, `1:1 UI Prototype Parity (SCR-<MOD>-<NN> + data-testid)`, `No-Stubbing`, 3-Step Crash Recovery, and the Phase Boundary Hard Stop on `"tiếp tục"`.
 
 #### 2) `<project>-domain-invariants`
 - **File:** [`.agents/skills/<project>-domain-invariants/SKILL.md`](.agents/skills/<project>-domain-invariants/SKILL.md)
 - **When to activate:** When designing domain logic, state transitions, or unit tests for core business flows.
 - **Core Enforcement:** Prevents drift from non-negotiable domain formulas, state machine guards, and data ownership boundaries defined in `SPEC.md`.
+
+#### 3) `ui-prototype-fidelity` *(Mandatory if Project Has UI Modules)*
+- **File:** [`.agents/skills/ui-prototype-fidelity/SKILL.md`](.agents/skills/ui-prototype-fidelity/SKILL.md)
+- **When to activate:** When executing Gate 4 WBS or Gate 5 Atomic Tasks for any UI / Frontend module referencing `SCR-<MOD>-<NN>` in `docs/prototypes/registry.md`.
+- **Core Enforcement:** Requires reading `docs/prototypes/<module-slug>/scr-<nn>-*.html` before coding, porting DOM hierarchy, CSS/Tailwind tokens, and `default`/`loading`/`empty`/`error` states 1:1, and asserting `data-testid` anchors in Task `.3` unit/component tests.
 
 ---
 

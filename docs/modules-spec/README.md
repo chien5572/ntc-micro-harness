@@ -7,7 +7,7 @@ docs/modules-spec/<module-slug>.md
 ```
 
 Each file in `docs/modules-spec/` serves two unified roles:
-1. **Detailed Module Specification:** Linked directly to root `SPEC.md` and `docs/plans/contract-registry.md`. Defines scope boundaries, user stories, tech stack, exact database/storage DDL schemas, provided/consumed contracts (`CT-<MOD>-<NN>`), core business flows & state machines, stage-by-stage **Given/When/Then** acceptance criteria, and error codes.
+1. **Detailed Module Specification:** Linked directly to root `SPEC.md`, `docs/plans/contract-registry.md`, and `docs/prototypes/registry.md` (for UI modules). Defines scope boundaries, user stories, tech stack, exact database/storage DDL schemas, provided/consumed contracts (`CT-<MOD>-<NN>`), UI screen & prototype mappings (`SCR-<MOD>-<NN>`), core business flows & state machines, stage-by-stage **Given/When/Then** acceptance criteria, and error codes.
 2. **Module Phase Sequence (`## 9. Module Phase Sequence`):** Defines all planned phases (`<MOD>-P<NN>`) for the module, aligned to Global Phases (`GP-<NN>`), tracking their status (`PENDING` | `ACTIVE` | `BLOCKED` | `COMPLETED`) and linking to their Phase Dossiers in `docs/plans/active/<module-slug>/` or `docs/plans/completed/<module-slug>/`.
 
 ## Rules

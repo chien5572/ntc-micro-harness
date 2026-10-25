@@ -17,6 +17,10 @@
 - **Primary Frameworks & Libraries:**
 - **Databases & Persistence:** (e.g., PostgreSQL, Redis, S3-compatible Object Storage)
 - **Communication Protocols & APIs:** (REST / gRPC / GraphQL / WebSockets / Message Queues)
+- **UI / Frontend Surface (`UI Required`):** `YES` (Web / Mobile / Desktop / Admin Portal) | `NO` (Backend / API / CLI / Headless only)
+- **UI Design Direction & Core Screens (if `UI Required: YES` — locked via HTML prototypes in Gate 3.0):**
+  - **Styling & Theme:** (e.g., Tailwind CSS, Light/Dark theme, primary brand color, typography)
+  - **Core Screens to Prototype (`SCR-<MOD>-<NN>`):** (e.g., Login, Dashboard, Order Detail)
 
 ## 3. Scope & System Boundaries
 ### In-Scope (Mandatory Deliverables):

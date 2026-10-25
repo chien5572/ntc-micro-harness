@@ -43,6 +43,7 @@ MODULE_STATUSES = {"PLANNED", "SPEC_REVIEW", "BLUEPRINT_REVIEW", "READY", "IN_PR
 GLOBAL_STATUSES = {"PENDING", "ACTIVE", "COMPLETED"}
 PHASE_STATUSES = {"PENDING", "ACTIVE", "BLOCKED", "COMPLETED"}
 CONTRACT_STATUSES = {"DRAFT", "AVAILABLE", "DEPRECATED"}
+PROTOTYPE_STATUSES = {"DRAFT", "APPROVED", "DEPRECATED"}
 CONTRACT_TYPES = {"REST", "gRPC", "Event", "Schema", "Library"}
 LIFECYCLE_STATUSES = {
     "PENDING",
@@ -373,9 +374,12 @@ class Validator:
             "docs/plans/contract-registry.md",
             "docs/plans/active/README.md",
             "docs/plans/completed/README.md",
+            "docs/prototypes/README.md",
+            "docs/prototypes/registry.md",
             "docs/templates/spec-template.md",
             "docs/templates/system-roadmap-template.md",
             "docs/templates/contract-registry-template.md",
+            "docs/templates/ui-prototype-registry-template.md",
             "docs/templates/module-spec-template.md",
             "docs/templates/ai-skill-maps-template.md",
             "docs/templates/step-by-step-template.md",
@@ -644,6 +648,107 @@ class Validator:
                                 "Codify the spec at the declared path (Contract-First) or set status back to DRAFT.",
                             )
 
+        # 4b. UI Prototype Registry (docs/prototypes/registry.md)
+        proto_rel = "docs/prototypes/registry.md"
+        draft_proto_by_module: Dict[str, List[str]] = {}
+        registered_screens: Dict[str, Tuple[str, str]] = {}  # sid -> (status, path)
+        if self.repo_path(proto_rel).is_file():
+            pr = self.get_required_table(
+                proto_rel,
+                r"^## 2\.\s*UI Screen & Prototype Registry",
+                "## 2. UI Screen & Prototype Registry",
+                ["Screen ID", "Module", "Screen Name", "Prototype Path", "States Covered", "Consumed Contracts", "Status"],
+            )
+            if pr is not None:
+                _, rows, label = pr
+                seen_scr: Dict[str, bool] = {}
+                for row in rows:
+                    if self.is_placeholder(row["Screen ID"]):
+                        continue
+                    sid = self.clear_cell(row["Screen ID"])
+                    where = f"{label} row '{sid}'"
+                    m_scr = re.match(r"^SCR-([A-Z]{2,5})-(\d{2})$", sid)
+                    if not m_scr:
+                        self.add_violation(
+                            "PROTOTYPE_ID",
+                            where,
+                            f"screen ID '{sid}' does not match SCR-<MOD>-<NN>",
+                            "Rename it, e.g. SCR-WEB-01.",
+                        )
+                        continue
+                    id_mod = m_scr.group(1)
+                    if sid in seen_scr:
+                        self.add_violation(
+                            "PROTOTYPE_DUPLICATE",
+                            where,
+                            f"screen ID '{sid}' is registered twice",
+                            "Screen IDs in docs/prototypes/registry.md must be unique.",
+                        )
+                    seen_scr[sid] = True
+                    mod_col = self.clear_cell(row["Module"])
+                    if mod_col != id_mod:
+                        self.add_violation(
+                            "PROTOTYPE_MODULE",
+                            where,
+                            f"module '{mod_col}' does not match the ID prefix '{id_mod}'",
+                            "The module code is part of the screen ID (SCR-<MOD>-<NN>).",
+                        )
+                    if slug_to_code and mod_col not in code_to_slug:
+                        self.add_violation(
+                            "PROTOTYPE_MODULE",
+                            where,
+                            f"module '{mod_col}' is not a registered module in docs/plans/system-roadmap.md",
+                            "Register the UI module in the Module Registry first.",
+                        )
+                    p_path = self.clear_cell(row["Prototype Path"])
+                    if self.is_placeholder(p_path) or not p_path.startswith("docs/prototypes/") or not p_path.endswith(".html"):
+                        self.add_violation(
+                            "PROTOTYPE_PATH",
+                            where,
+                            f"prototype path '{p_path}' must be an .html file inside docs/prototypes/<module-slug>/",
+                            "Use a path such as docs/prototypes/web/scr-01-login.html.",
+                        )
+                    p_status = self.clear_cell(row["Status"])
+                    registered_screens[sid] = (p_status, p_path)
+                    if p_status not in PROTOTYPE_STATUSES:
+                        self.add_violation(
+                            "PROTOTYPE_STATUS",
+                            where,
+                            f"status '{p_status}' is not one of {' | '.join(sorted(PROTOTYPE_STATUSES))}",
+                            "Use DRAFT, APPROVED, or DEPRECATED.",
+                        )
+                    if p_status == "DRAFT":
+                        draft_proto_by_module.setdefault(mod_col, []).append(sid)
+                    elif p_status == "APPROVED":
+                        p_file = self.repo_path(p_path)
+                        if self.is_placeholder(p_path) or not p_file.is_file():
+                            self.add_violation(
+                                "PROTOTYPE_FILE_MISSING",
+                                where,
+                                f"status is APPROVED but HTML prototype '{p_path}' does not exist on disk",
+                                "Create the interactive HTML prototype file in Gate 3.0 or set status back to DRAFT.",
+                            )
+                        else:
+                            html_text = p_file.read_text(encoding="utf-8", errors="ignore")
+                            if "data-testid=" not in html_text:
+                                self.add_violation(
+                                    "PROTOTYPE_TESTID_MISSING",
+                                    where,
+                                    f"approved prototype '{p_path}' contains no data-testid=\"...\" attributes",
+                                    "Add data-testid=\"scr-<nn>-<element>\" anchors to key DOM elements in the prototype so Gate 5 tests can enforce 1:1 parity.",
+                                )
+                    consumed_cell = self.clear_cell(row["Consumed Contracts"])
+                    if not self.is_placeholder(consumed_cell):
+                        for c_raw in consumed_cell.split(","):
+                            c_id = c_raw.strip()
+                            if c_id and not re.match(r"^CT-[A-Z]{2,5}-\d{2}$", c_id):
+                                self.add_violation(
+                                    "PROTOTYPE_CONTRACT_REF",
+                                    where,
+                                    f"consumed contract '{c_id}' does not match CT-<PROVIDER>-<NN>",
+                                    "Reference valid Contract IDs from docs/plans/contract-registry.md (or —).",
+                                )
+
         # 5. Global Phase Sequence
         if has_roadmap:
             gp = self.get_required_table(
@@ -842,6 +947,22 @@ class Validator:
                                             f"archived dossier has unchecked Atomic Task '{task_id}'",
                                             "Only verified phases may be archived; move it back to active/ or complete the task.",
                                         )
+                                for m_scr_ref in re.finditer(r"\b(SCR-[A-Z]{2,5}-\d{2})\b", line):
+                                    scr_ref = m_scr_ref.group(1)
+                                    if scr_ref not in registered_screens:
+                                        self.add_violation(
+                                            "PROTOTYPE_UNREGISTERED",
+                                            f"{rel}:{line_no}",
+                                            f"dossier references UI prototype '{scr_ref}' which is not in docs/prototypes/registry.md",
+                                            "Register the screen in docs/prototypes/registry.md (Gate 3.0) and mark it APPROVED.",
+                                        )
+                                    elif registered_screens[scr_ref][0] != "APPROVED":
+                                        self.add_violation(
+                                            "PROTOTYPE_NOT_APPROVED",
+                                            f"{rel}:{line_no}",
+                                            f"dossier references UI prototype '{scr_ref}' with status '{registered_screens[scr_ref][0]}' (must be APPROVED)",
+                                            "Get Human Architect sign-off on the HTML prototype in Gate 3.0 before Gate 4/5.",
+                                        )
                         elif PLAN_FILE_PATTERN.match(child.name):
                             continue
                         else:
@@ -903,6 +1024,14 @@ class Validator:
                         "Create docs/modules-spec/<slug>.md (Gate 3) before generating Phase Dossiers (Gate 4).",
                     )
                 continue
+
+            if (disk_active or disk_done) and draft_proto_by_module.get(code):
+                self.add_violation(
+                    "PROTOTYPE_NOT_APPROVED",
+                    proto_rel,
+                    f"module '{code}' has phase dossiers (Gate 4/5) but UI prototype(s) {', '.join(draft_proto_by_module[code])} are still DRAFT",
+                    "All UI prototypes for a module in docs/prototypes/registry.md must be APPROVED before Gate 4/5.",
+                )
 
             sp = self.get_required_table(
                 spec_rel,

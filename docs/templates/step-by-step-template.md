@@ -48,10 +48,11 @@ Thực hiện Gate 4 (Pre-Generate Phase Dossiers & WBS) cho Module <MOD> (<modu
 Căn cứ vào:
 - @AGENTS.md và @docs/WORKFLOW.md
 - @ai-skill-maps.md (BẮT BUỘC đọc và áp dụng các skill: `atomic-harness-gatekeeper`, `<project>-domain-invariants`, `<module-skills>`)
-- @docs/modules-spec/<module-slug>.md (Mục 9: Module Phase Sequence)
-- @docs/plans/contract-registry.md
+- @docs/modules-spec/<module-slug>.md (Mục 9: Module Phase Sequence & Mục 5.4: UI Screen Mapping nếu có)
+- @docs/plans/contract-registry.md và @docs/prototypes/registry.md (nếu module có giao diện UI)
 
 Hãy khởi tạo TOÀN BỘ các file Phase Dossiers của module `<module-slug>` tại `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` (từ `docs/templates/phase-dossier-template.md`) và phân rã chi tiết từng Major Task thành các Atomic Tasks (Level 4: `.1` Contract/Schema -> `.2` Implementation -> `.3` Unit Test/Verification).
+Nếu là module UI, mỗi Atomic Task giao diện BẮT BUỘC điền rõ `UI Prototype Reference: SCR-<MOD>-<NN>` trỏ tới file `.html` đã chốt trong `docs/prototypes/<module-slug>/`.
 Chỉ đặt `Lifecycle Status: READY_TO_EXECUTE` cho Phase 01 và `PENDING` cho các Phase kế tiếp.
 Sau khi tạo xong, chạy `python scripts/validate_plans.py --fix` và dừng lại báo cáo bảng WBS để tôi duyệt. Chưa viết code sản phẩm.
 ```
@@ -87,9 +88,9 @@ Chạy kiểm chứng thực tế (Executable Proof), tick `[x]`, cập nhật `
 ```text
 Tôi muốn bắt đầu triển khai Gate 5 cho Module <MOD> (`<module-slug>`) độc lập ở tab này, bắt đầu từ Phase `<MOD>-P01`.
 Căn cứ vào:
-- @AGENTS.md (Chỉ tạo/sửa code trong `<code-root>` và hồ sơ trong `docs/plans/active/<module-slug>/`; 1 Turn = 1 Atomic Task)
+- @AGENTS.md (Chỉ tạo/sửa code trong `<code-root>` và hồ sơ trong `docs/plans/active/<module-slug>/`; 1 Turn = 1 Atomic Task; Bảo toàn 1:1 UI Prototype nếu là task UI)
 - @ai-skill-maps.md (BẮT BUỘC đọc và áp dụng các skill: `atomic-harness-gatekeeper`, `<project>-domain-invariants`, `<module-skills>`)
-- @docs/plans/contract-registry.md (các hợp đồng phụ thuộc đã AVAILABLE)
+- @docs/plans/contract-registry.md (các hợp đồng phụ thuộc đã AVAILABLE) và @docs/prototypes/registry.md (nếu module có UI: BẮT BUỘC đọc file `.html` prototype của `SCR-<MOD>-<NN>`, giữ nguyên 100% cấu trúc DOM, class/tokens, các trạng thái UI và `data-testid`)
 - @docs/modules-spec/<module-slug>.md
 - @docs/plans/active/<module-slug>/phase-01-<slug>.md
 
@@ -107,9 +108,9 @@ A. Thiết lập Không gian làm việc Cô lập (Worktree):
 - Mọi thao tác tạo/sửa file chỉ được thực hiện bên trong worktree này, giới hạn trong `<code-root>` và `docs/plans/active/<module-slug>/`.
 
 B. Căn cứ Kỹ thuật & Kỹ năng Bắt buộc:
-- @AGENTS.md (1 Turn = 1 Atomic Task, Crash Recovery, Phase Boundary Hard Stop)
+- @AGENTS.md (1 Turn = 1 Atomic Task, 1:1 UI Prototype Parity, Crash Recovery, Phase Boundary Hard Stop)
 - @ai-skill-maps.md (BẮT BUỘC đọc và áp dụng: `using-git-worktrees`, `atomic-harness-gatekeeper`, `<project>-domain-invariants`, `<module-skills>`)
-- @docs/plans/contract-registry.md
+- @docs/plans/contract-registry.md và @docs/prototypes/registry.md (nếu module có UI: BẮT BUỘC đọc file `.html` prototype của `SCR-<MOD>-<NN>` và chuyển đổi 1:1 DOM/styles/`data-testid`)
 - @docs/modules-spec/<module-slug>.md
 - @docs/plans/active/<module-slug>/phase-01-<slug>.md
 
