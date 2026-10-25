@@ -1,32 +1,37 @@
 # Execution Plans & Dossiers
 
-In the **Harness Atomic Engineering** protocol (Microservices Edition), planning is layered and execution documents are decoupled into distributed dossiers to protect LLM context windows and guarantee token budget efficiency.
+In the **Harness Atomic Engineering** protocol (Microservices Edition v2.0), planning and specifications are layered into distributed files to protect LLM context windows and guarantee token budget efficiency.
 
 ## Storage Structure
 
 ```text
-docs/plans/
-├── system-roadmap.md                     <-- PROJECT ROADMAP (Global Phases, Module Registry, dependency graph, Active Work Pointer)
-├── contract-registry.md                  <-- CROSS-MODULE CONTRACTS (provider, consumers, spec path, version, status)
-├── modules/
-│   ├── system.md                         <-- Blueprint of the reserved cross-cutting pseudo-module (SYS)
-│   └── <module-slug>.md                  <-- MODULE BLUEPRINT (phases, diagrams, flows, contracts of ONE module)
-├── active/
-│   └── <module-slug>/
-│       └── phase-<NN>-<slug>.md          <-- IN PROGRESS: Module Phase Dossier (with real-time Resume Ticket)
-└── completed/
-    └── <module-slug>/
-        └── phase-<NN>-<slug>.md          <-- DONE: archived, verified dossiers (immutable audit record)
+docs/
+├── modules-spec/
+│   ├── system.md                             <-- Detailed Spec + Phase Sequence of reserved SYS module
+│   └── <module-slug>.md                      <-- DETAILED MODULE SPEC + Module Phase Sequence (<MOD>-P<NN>)
+└── plans/
+    ├── system-roadmap.md                     <-- PROJECT ROADMAP (Global Phases, Module Registry, Dependency Graph, Active Work Pointer)
+    ├── contract-registry.md                  <-- CROSS-MODULE CONTRACTS (provider, consumers, spec path, version, status)
+    ├── active/
+    │   └── <module-slug>/
+    │       ├── phase-01-<slug>.md            <-- ACTIVE PHASE DOSSIER (IN_PROGRESS, with real-time 🎫 Resume Ticket)
+    │       └── phase-02-<slug>.md            <-- PRE-GENERATED PHASE DOSSIER (PENDING until phase-01 is archived)
+    └── completed/
+        └── <module-slug>/
+            └── phase-<NN>-<slug>.md          <-- DONE: archived, verified dossiers (immutable audit record)
 ```
 
-- `active/` answers *"what is being worked on?"*; `completed/` answers *"what is finished?"*.
-- Each `active/<module-slug>/` holds **at most one** phase dossier. Small bounded plans (`docs/templates/exec-plan.md`) may also live there as `plan-<slug>.md`.
+- `docs/modules-spec/<module-slug>.md` defines **what** each module must do in detail and lists its phases.
+- `docs/plans/active/<module-slug>/` holds all uncompleted Phase Dossiers pre-generated during **Gate 4**. Within a module, at most **one** dossier has `Lifecycle Status: IN_PROGRESS` (or `PHASE_COMPLETED` awaiting transition), while subsequent phases remain `PENDING`.
+- `docs/plans/completed/<module-slug>/` holds verified, archived Phase Dossiers.
 
 ## Operating Lifecycle
 
-1. **Gate 2:** At project inception, `system-roadmap.md` and `contract-registry.md` are derived from `SPEC.md`.
-2. **Gate 3:** When a module is to be planned, instantiate `modules/<module-slug>.md` from `docs/templates/module-roadmap-template.md`.
-3. **Gate 4:** When starting phase N of a module, instantiate `active/<module-slug>/phase-<NN>-<slug>.md` from `docs/templates/phase-dossier-template.md`.
-4. **Gate 5:** Throughout execution, the `🎫 Resume Ticket` at the top of the active dossier is updated before ending any turn, and the Active Work Pointer in `system-roadmap.md` is updated whenever stage or focus changes.
-5. **Archival:** When all Atomic Tasks pass verification, move the dossier to `completed/<module-slug>/`, then update the phase status in the Module Blueprint and the pointer / Global Phase status in `system-roadmap.md`.
-6. **Validation:** run `scripts/validate-plans.ps1` after any planning change or archival step.
+1. **Gate 2:** Derive `system-roadmap.md` and `contract-registry.md` from `SPEC.md`.
+2. **Gate 3:**
+   - Instantiate `docs/modules-spec/<module-slug>.md` from `docs/templates/module-spec-template.md` for **all modules**.
+   - Ask the user for skill search websites, propose skills for user approval, install them into `.agents/skills/`, and generate `ai-skill-maps.md` (from `docs/templates/ai-skill-maps-template.md`).
+   - Generate `STEP-by-STEP.md` (from `docs/templates/step-by-step-template.md`) for the Human Architect (agents do not read `STEP-by-STEP.md`).
+3. **Gate 4:** Pre-generate **all Phase Dossiers** (`docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` from `docs/templates/phase-dossier-template.md`) with full Major & Atomic Task WBS across **all modules** before writing any production code.
+4. **Gate 5:** Execute one Atomic Task per turn (`1 Turn = 1 Task`) driven by `"tiếp tục"`. When all Atomic Tasks of a phase complete, require `"tiếp tục phase <MOD>-P<NN+1>"` to archive the finished dossier to `completed/<module-slug>/`, activate the next dossier, and execute its first task.
+5. **Validation & Auto-Sync:** Run `python scripts/validate_plans.py --fix` after any planning change or phase transition.

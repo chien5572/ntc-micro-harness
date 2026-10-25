@@ -10,14 +10,16 @@ Status: Active | Blocked | Completed
 > - For complex systems, multi-service backends, or multi-phase projects: Use the layered standard:
 >   1. `docs/templates/system-roadmap-template.md` -> located at `docs/plans/system-roadmap.md`
 >   2. `docs/templates/contract-registry-template.md` -> located at `docs/plans/contract-registry.md`
->   3. `docs/templates/module-roadmap-template.md` -> located at `docs/plans/modules/<module-slug>.md`
->   4. `docs/templates/phase-dossier-template.md` -> located at `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md`
+>   3. `docs/templates/module-spec-template.md` -> located at `docs/modules-spec/<module-slug>.md`
+>   4. `docs/templates/ai-skill-maps-template.md` -> located at `ai-skill-maps.md`
+>   5. `docs/templates/step-by-step-template.md` -> located at `STEP-by-STEP.md` (Human-Only Playbook)
+>   6. `docs/templates/phase-dossier-template.md` -> located at `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md`
 
 ## Outcome
 Describe the observable result this work must produce.
 
 ## Context
-Link the relevant product, architecture, decision, code, and validation truth.
+Link the relevant product, module spec (`docs/modules-spec/<module-slug>.md`), skill map (`ai-skill-maps.md`), decision, code, and validation truth.
 
 ## Approach & Atomic Tasks
 - [ ] Task 1
@@ -25,7 +27,7 @@ Link the relevant product, architecture, decision, code, and validation truth.
 
 ## Validation
 - Focused proof:
-- Repository checks:
+- Repository checks (`python scripts/validate_plans.py`):
 
 ## Result
 Complete after implementation. Record verified outcome and evidence.

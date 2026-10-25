@@ -1,31 +1,35 @@
 # Module Phase Dossier: <MOD>-P<NN> - <Phase Title>
 
-> **Module:** `<MOD>` (`docs/plans/modules/<module-slug>.md#7-module-phase-sequence`)  
+> **Module:** `<MOD>` (`docs/modules-spec/<module-slug>.md#9-module-phase-sequence`)  
 > **Global Phase:** `GP-<NN>` (`docs/plans/system-roadmap.md#3-global-phase-sequence`)  
-> **Location:** `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` → moved to `docs/plans/completed/<module-slug>/` when verified  
+> **Skill Map Reference:** `ai-skill-maps.md`  
+> **Mandatory Skills Activated:** `atomic-harness-gatekeeper`, `<project>-domain-invariants`, `<module-tech-skills>`  
+> **Location:** `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` → moved to `docs/plans/completed/<module-slug>/` when verified & transitioned  
 > **Phase Owner:** AI Agent & Human Architect  
 > **Last Updated:** YYYY-MM-DD HH:MM  
 
 ---
 
 ## 🎫 Resume Ticket (Instant State Checkpoint)
-<!-- AGENT INVARIANT: MANDATORY to update this block before concluding ANY response turn -->
+<!-- AGENT INVARIANT: Update to IN_PROGRESS BEFORE editing code (write-ahead), and update before concluding ANY turn. -->
 - **Module:** `<MOD>`
-- **Lifecycle Status:** `READY_TO_PLAN` | `WBS_REVIEW` | `IN_PROGRESS` | `BLOCKED_BY_DEPENDENCY` | `INTERRUPTED` | `PHASE_COMPLETED`
+- **Lifecycle Status:** `PENDING` | `READY_TO_EXECUTE` | `IN_PROGRESS` | `BLOCKED_BY_DEPENDENCY` | `INTERRUPTED` | `PHASE_COMPLETED`
 - **Active Major Task:** Major Task <MOD>-P<NN>.1 - <Major Task Name>
 - **Active Atomic Task:** Atomic Task <MOD>-P<NN>.1.1 - <Atomic Task Name>
 - **In-flight File & Location:** `services/<module-slug>/src/service.ts:42`
-- **Current Context / State:** Parsing logic completed; currently implementing repository calls; unit test `services/<module-slug>/tests/service.spec.ts` failing at case Y.
+- **Current Context / State:** Parsing logic completed; currently implementing repository calls; unit test `services/<module-slug>/tests/service.spec.ts` passing/failing at case Y.
 - **Immediate Next Atomic Action (When resuming):**
-  Open `services/<module-slug>/src/service.ts` at line 42, finish repository invocation, then execute `npm test --prefix services/<module-slug>`.
+  Execute Atomic Task `<MOD>-P<NN>.1.2` in `services/<module-slug>/src/service.ts`, then run `npm test --prefix services/<module-slug>`.
 
 ---
 
 ## 1. Phase Architecture & Boundary Check
 - **Phase Objective:**
+- **Detailed Module Spec Section Reference:** `docs/modules-spec/<module-slug>.md` (§...)
+- **Mandatory Skills Read Before Execution:** `.agents/skills/atomic-harness-gatekeeper/SKILL.md`, `...`
 - **Module Code Root (Single-Module Scope):** `services/<module-slug>/`
 - **Boundary with other Phases of this Module (preventing regressions):**
-- **Cross-Module Dependencies (Dependency Gate — all must be `AVAILABLE`):**
+- **Cross-Module Dependencies (Dependency Gate — all must be `AVAILABLE` before Gate 5 execution of this phase):**
 
   | Contract ID | Provider | Registry Status | Used For |
   | :--- | :--- | :--- | :--- |
@@ -51,27 +55,29 @@
 - [ ] **Atomic Task <MOD>-P<NN>.1.3:** Implement and verify unit tests for Major Task <MOD>-P<NN>.1.
 
 ### Major Task <MOD>-P<NN>.2: <Feature / Component 2>
-*(Will be decomposed into Atomic Tasks upon completion of Major Task 1 or on demand)*
-- [ ] **Atomic Task <MOD>-P<NN>.2.1:** ...
+- [ ] **Atomic Task <MOD>-P<NN>.2.1:** Define Interfaces / Types / Schemas for Component 2. *(Contract-First)*
+- [ ] **Atomic Task <MOD>-P<NN>.2.2:** Implement domain logic for Component 2.
+- [ ] **Atomic Task <MOD>-P<NN>.2.3:** Implement and verify unit tests for Major Task <MOD>-P<NN>.2.
 
 ---
 
 ## 3. Atomic Task Specifications & Execution Protocol
 
-> **Execution Rule:** 
-> 1 Chat Turn = Execute EXACTLY 1 Atomic Task, inside this module's Code Root only. 
-> After completing each Atomic Task: Run validation -> Check off [x] -> Update Resume Ticket -> STOP and report.
+> **Execution & `"Tiếp tục"` State Machine Rule:**
+> - **1 Chat Turn = Execute EXACTLY 1 Atomic Task**, inside this module's `Code Root` only.
+> - **When user types `"tiếp tục"`:** Reconcile working tree (3-Step Crash Recovery), then execute the next sequential unchecked `- [ ]` Atomic Task.
+> - **When completing the LAST Atomic Task of this phase:** Check off `[x]`, set `Lifecycle Status: PHASE_COMPLETED`, and announce that all tasks of `<MOD>-P<NN>` are done and the user must enter `"tiếp tục phase <MOD>-P<NN+1>"` to transition.
+> - **Hard Stop:** Never advance to `<MOD>-P<NN+1>` on plain `"tiếp tục"`. Only on `"tiếp tục phase <MOD>-P<NN+1>"` do you archive this dossier to `docs/plans/completed/<module-slug>/`, run `python scripts/validate_plans.py --fix`, activate `<MOD>-P<NN+1>`, and execute `<MOD>-P<NN+1>.1.1`.
 
 ### Atomic Task <MOD>-P<NN>.1.1: [Task Name]
 - **Objective:**
 - **Target Files:** `services/<module-slug>/src/...`
 - **Contracts Touched:** `CT-<MOD>-01` (or none)
 - **Executable Proof Command:** `npm test` or `pytest tests/...`
-- **Acceptance Criteria:**
+- **Acceptance Criteria (from `docs/modules-spec/<module-slug>.md`):**
 
 ---
 
 ## 4. Execution Evidence & Verification Log
 *(Record diagnostic proof and test output after each atomic task)*
 - **Atomic Task <MOD>-P<NN>.1.1:** PASS - [Log / Test result snippet]
-- **Atomic Task <MOD>-P<NN>.1.2:** PASS - [Log / Test result snippet]

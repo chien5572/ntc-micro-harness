@@ -6,10 +6,10 @@
 > **Last Synchronized:** YYYY-MM-DD  
 
 <!--
-STRUCTURE INVARIANTS (checked by scripts/validate-plans.ps1):
+STRUCTURE INVARIANTS (checked by scripts/validate_plans.py):
 - Keep the section headings "## 2. Module Registry", "## 3. Global Phase Sequence", and "## 5. Active Work Pointer".
 - Keep table header names unchanged; wrap codes, slugs, IDs, paths, and statuses in backticks.
-- Module status:       PLANNED | BLUEPRINT_REVIEW | READY | IN_PROGRESS | COMPLETED
+- Module status:       PLANNED | SPEC_REVIEW | READY | IN_PROGRESS | COMPLETED
 - Global phase status: PENDING | ACTIVE | COMPLETED
 -->
 
@@ -40,16 +40,16 @@ flowchart LR
 
 ## 2. Module Registry
 
-| Code | Slug | Responsibility | Code Root | Blueprint | Depends On | Status |
+| Code | Slug | Responsibility | Code Root | Module Spec | Depends On | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `SYS` | `system` | Cross-cutting: shared contracts package, local orchestration, CI, gateway, E2E tests | `./` | `docs/plans/modules/system.md` | — | `PLANNED` |
-| `AUTH` | `auth` | Identity, credentials, token issuance | `services/auth/` | `docs/plans/modules/auth.md` | `SYS` | `IN_PROGRESS` |
-| `ORD` | `order` | Order lifecycle | `services/order/` | `docs/plans/modules/order.md` | `SYS`, `AUTH` | `PLANNED` |
+| `SYS` | `system` | Cross-cutting: shared contracts package, local orchestration, CI, gateway, E2E tests | `./` | `docs/modules-spec/system.md` | — | `PLANNED` |
+| `AUTH` | `auth` | Identity, credentials, token issuance | `services/auth/` | `docs/modules-spec/auth.md` | `SYS` | `IN_PROGRESS` |
+| `ORD` | `order` | Order lifecycle | `services/order/` | `docs/modules-spec/order.md` | `SYS`, `AUTH` | `PLANNED` |
 
 ---
 
 ## 3. Global Phase Sequence
-*(Project-level phases, described at a high level. Detailed work lives in each Module Blueprint.)*
+*(Project-level phases, described at a high level. Detailed phase breakdown lives in each `docs/modules-spec/<slug>.md`.)*
 
 | GP | Title | Objective | Participating Module Phases | Exit Criteria | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -75,11 +75,12 @@ flowchart LR
 ---
 
 ## 5. Active Work Pointer
-<!-- AGENT INVARIANT: update whenever the current stage or focus changes. The table MUST match docs/plans/active/ exactly. -->
+<!-- AGENT INVARIANT: update whenever the current stage or focus changes, or run `python scripts/validate_plans.py --fix`. -->
 - **Current Stage:** Gate 1 | Gate 2 | Gate 3 | Gate 4 | Gate 5
 - **Current Focus:** `AUTH` → `docs/plans/active/auth/phase-01-contracts-and-schema.md`
-- **Planning Item In Review (Gate 2/3 only):** e.g. `docs/plans/modules/order.md` — `IN_REVIEW`
+- **Planning Item In Review (Gate 2/3/4 only):** e.g. `docs/modules-spec/order.md` — `SPEC_REVIEW`
 
 | Module | Active Dossier | Lifecycle Status |
 | :--- | :--- | :--- |
 | `AUTH` | `docs/plans/active/auth/phase-01-contracts-and-schema.md` | `IN_PROGRESS` |
+| `AUTH` | `docs/plans/active/auth/phase-02-core-domain-logic.md` | `PENDING` |

@@ -1,43 +1,58 @@
 # Agent Instructions
 
 <!-- HARNESS:BEGIN -->
-## Harness: Atomic Engineering Protocol (Microservices Edition)
+## Harness: Atomic Engineering Protocol (Microservices Edition v2.0)
 
-Start with the requested outcome and use the repository as the system of record.
-Read `docs/WORKFLOW.md` and only the relevant system, module, phase, code, and validation material.
+Start with the requested outcome and use the repository as the single system of record.
+Read `docs/WORKFLOW.md` and only the relevant system, module spec, skill map, phase dossier, code, and validation material.
 
 ### Core Operating Invariants
 
 1. **Hierarchy of Truth & Documents** (a lower document must never contradict a higher one; on conflict, STOP and ask):
-   - `SPEC.md`: The supreme specification, functional boundaries, and architectural intent defined by the Human Architect.
+   - `SPEC.md`: The supreme system specification, functional boundaries, and architectural intent defined by the Human Architect.
    - `AGENTS.md`: The mandatory operating contract, behavioral boundaries, and execution rules.
    - `docs/plans/system-roadmap.md`: The Project Roadmap — architecture blueprint, Module Registry, Global Phases, inter-module dependency graph, and the **Active Work Pointer**.
    - `docs/plans/contract-registry.md`: The Cross-Module Contract Registry — every inter-module API, event, and shared schema with provider, consumers, spec path, version, and status.
-   - `docs/plans/modules/<module>.md`: The Module Blueprint — charter, diagrams, data ownership, flows, provided/consumed contracts, and the module's own phase sequence.
-   - `docs/plans/active/<module>/phase-<NN>-<slug>.md`: The active Module Phase Dossier containing Major Tasks, Atomic Work Breakdown Structure (WBS), and the real-time Resume Ticket.
-   - `docs/plans/completed/<module>/phase-<NN>-<slug>.md`: Verified, archived dossiers (immutable audit record).
+   - `docs/modules-spec/<module-slug>.md`: The Detailed Module Specification — linked to `SPEC.md`, defining scope, user stories, exact DB/storage schemas, contracts, business flows/state machines, Given/When/Then acceptance criteria, error codes, and the **Module Phase Sequence** (`<MOD>-P<NN>`).
+   - `ai-skill-maps.md`: The Project AI Skill Playbook — maps every module and phase to mandatory local skills (`.agents/skills/<skill-name>/SKILL.md`) that the agent MUST read before planning or writing code.
+   - `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md`: Pre-generated Module Phase Dossiers containing Major Tasks, Atomic Work Breakdown Structure (WBS), and the real-time `🎫 Resume Ticket`.
+   - `docs/plans/completed/<module-slug>/phase-<NN>-<slug>.md`: Verified, archived dossiers (immutable audit record).
+   - **Human-Only Boundary (`STEP-by-STEP.md`):** The root `STEP-by-STEP.md` file is generated at the end of Gate 3 strictly for the **Human Architect** to read and copy prompts from. **AI Agents MUST NOT read `STEP-by-STEP.md` during execution.**
 
 2. **The 5-Stage Gated Lifecycle (NEVER skip gates):**
-   - **Gate 1 - Specification Ingestion:** When instructed to read `SPEC.md` and `AGENTS.md`, analyze architecture, propose candidate modules (services), and audit risks. **NEVER start writing code.**
-   - **Gate 2 - Project Roadmap Alignment:** Collaboratively build `docs/plans/system-roadmap.md` (Module Registry, Global Phases, dependency graph) and `docs/plans/contract-registry.md` with the user. Await user approval before any module work.
-   - **Gate 3 - Module Blueprint:** Only when instructed to plan a specific module, instantiate `docs/plans/modules/<module>.md` from `docs/templates/module-roadmap-template.md`, strictly respecting the Project Roadmap and Contract Registry. One module per request. Await user approval.
-   - **Gate 4 - Module Phase Dossier & Recursive Atomic Breakdown:** Only when instructed to start a phase of a module, instantiate `docs/plans/active/<module>/phase-<NN>-<slug>.md`. Elaborate Major Tasks, then break them into **Atomic Tasks (Level 4 - Micro-tasks)**. If the user feels it is not detailed enough, continue the recursive breakdown loop.
-   - **Gate 5 - Atomic Implementation:** **ONLY begin code implementation when the user explicitly instructs to implement a specific Atomic Task ID** (`<MOD>-P<NN>.<M>.<A>`).
+   - **Gate 1 - Root Specification Ingestion:** When instructed to read `SPEC.md` and `AGENTS.md`, analyze system architecture, propose candidate modules (services) with data ownership (`SYS` reserved for cross-cutting work), and audit technical risks. **NEVER start writing production code.**
+   - **Gate 2 - Project Roadmap & Contract Registry Alignment:** Collaboratively build `docs/plans/system-roadmap.md` (Module Registry pointing to `docs/modules-spec/<slug>.md`, Global Phases, dependency graph, Active Work Pointer) and `docs/plans/contract-registry.md`. Await user approval before Gate 3.
+   - **Gate 3 - All Detailed Module SPECs, `ai-skill-maps.md`, and `STEP-by-STEP.md`:**
+     - **Step 3.1 (All Detailed Module SPECs):** Instantiate `docs/modules-spec/<module-slug>.md` from `docs/templates/module-spec-template.md` for **ALL registered modules** in the project, strictly aligned with `SPEC.md` and `docs/plans/contract-registry.md`.
+     - **Step 3.2 (Interactive Skill Discovery & `ai-skill-maps.md`):** Once all `docs/modules-spec/*.md` files are complete, **STOP and ask the user** to input website URLs or skill repositories (e.g., `https://skillsmp.com/search`, `https://felo.ai/vi/skills`, GitHub) to search for relevant AI skills/plugins. Propose a candidate skill list (including custom project skills like `atomic-harness-gatekeeper` and `<project>-domain-invariants`) mapped to modules for user review. **Only after the user approves the skill list**, install the skills into `.agents/skills/` and instantiate `ai-skill-maps.md` from `docs/templates/ai-skill-maps-template.md`.
+     - **Step 3.3 (Generate Human Playbook `STEP-by-STEP.md`):** Immediately after `ai-skill-maps.md` is created, instantiate `STEP-by-STEP.md` from `docs/templates/step-by-step-template.md` containing the dependency execution order and copy-paste prompts (enforcing `ai-skill-maps.md` and `docs/modules-spec/<slug>.md`). Await user approval before Gate 4.
+   - **Gate 4 - Full Phase Dossiers & WBS Pre-Generation (Project-Wide):**
+     - Consult `ai-skill-maps.md`, read the required `.agents/skills/<skill>/SKILL.md` files, and instantiate **ALL Phase Dossiers** (`docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` from `docs/templates/phase-dossier-template.md`) for **ALL modules in the entire project**.
+     - Decompose every phase into Major Tasks (`<MOD>-P<NN>.<M>`) and **Atomic Tasks (Level 4 - Micro-tasks: `<MOD>-P<NN>.<M>.<A>`)**.
+     - **Gate 4 Exit Lock:** Code implementation (Gate 5) is strictly forbidden until **every planned phase of every module** has its Phase Dossier generated in `docs/plans/active/`, passes `python scripts/validate_plans.py`, and is approved by the user.
+   - **Gate 5 - Atomic Implementation & `"Tiếp tục"` State Machine:**
+     - Begin code implementation ONLY after Gate 4 is complete and the user instructs to start or continue a phase/task.
 
-3. **Implementation Invariants (Strict Execution):**
-   - **Single Atomic Task Turn (1 Turn = 1 Task):** In any single response, execute **ONLY ONE ATOMIC TASK**. Never implement multiple tasks, modules, or services at once.
-   - **Single-Module Scope:** An atomic task modifies only its own module's Code Root (declared in the Module Registry) and that module's planning files. Edits to shared contracts are their own atomic task.
-   - **Contract-First (Module):** Task 1 of any module phase MUST define Types, Interfaces, Schemas, DTOs, or Protobufs before implementing business logic.
-   - **Contract-First (Cross-Module):** Every inter-module API, event, or shared schema MUST be registered in `docs/plans/contract-registry.md` and codified at its declared spec path (status `AVAILABLE`) before provider or consumer logic is written.
-   - **Contract Change Control:** Changing a registered contract bumps its version and lists impacted consumers in the registry change log. Breaking changes require explicit user approval and a decision record (`docs/templates/decision.md`).
-   - **Dependency Gate:** A module phase may start only when the contracts it consumes are `AVAILABLE`. Consume other modules only through registered contracts (contract-derived test doubles are allowed). Never reach into another module's internals, storage, or source.
-   - **Executable Proof:** Every atomic task must be verified with executable proof (unit tests pass, typechecks succeed, or explicit diagnostic logs). Never claim completion without proof.
-   - **No-Stubbing Rule:** Never output incomplete stubs (`// TODO`, `// implement later`). Code must be fully implemented or bounded strictly to that atomic task.
+3. **Implementation Invariants (Strict Execution at Gate 5):**
+   - **Single Atomic Task Turn (1 Turn = 1 Task):** In any single response, execute **ONLY ONE ATOMIC TASK** (`<MOD>-P<NN>.<M>.<A>`). Never implement multiple tasks, modules, or phases at once.
+   - **Skill Activation Invariant:** Before implementing a module's phase, read the mandatory skills listed for that module/phase in `ai-skill-maps.md`.
+   - **Single-Module Scope & Multi-Agent Isolation:** An atomic task modifies only its own module's `Code Root` and that module's dossier in `docs/plans/active/<module-slug>/`. Parallel agents (across tabs, subagents, or isolated Git Worktrees) may execute independent modules simultaneously once shared contracts (`CT-*`) are `AVAILABLE`.
+   - **Contract-First (Module & Cross-Module):** Task `.1` of any Major Task MUST define Types, Interfaces, Schemas, DTOs, or Protobufs before business logic. Every cross-module contract in `docs/plans/contract-registry.md` must be codified at its spec path (status `AVAILABLE`) before consumer/provider integration logic is written.
+   - **Contract Change Control:** Changing a registered contract bumps its semantic version and logs impacted consumers. Breaking changes require explicit user approval and a decision record (`docs/templates/decision.md`).
+   - **Executable Proof & No-Stubbing Rule:** Every atomic task must be verified with executable proof (unit tests pass, typechecks succeed, or diagnostic logs). Never output incomplete stubs (`// TODO`, `// implement later`).
+   - **In-Phase Dynamic Amendment:** If an unforeseen bug or edge case is discovered during Gate 5 within the current module's scope, insert a sub-task (`<MOD>-P<NN>.<M>.<A>a`) into the active dossier, document the reason, and execute it atomically.
 
-4. **Micro-State Checkpointing & Resume Engine:**
-   - **Before yielding any turn**, the agent MUST update the `🎫 Resume Ticket` at the top of the active dossier (`docs/plans/active/<module>/phase-<NN>-<slug>.md`), and update the **Active Work Pointer** in `docs/plans/system-roadmap.md` whenever the current stage or focus changes.
-   - The ticket must capture: module, phase, current file, line number, dirty state, test failures, and the **Immediate Next Atomic Action**.
-   - **One Active Phase per Module:** each `docs/plans/active/<module>/` holds at most one dossier. Several modules may be active, but only one is the **Current Focus**.
-   - **Zero-Context Resume:** When the user returns (whether next day or next month) and asks *"Continue"*, *"Where were we?"*, *"Tiếp tục"*, or *"Đang làm đến đâu rồi"* (optionally followed by a module code), read the Active Work Pointer → open the named or focused dossier in `docs/plans/active/<module>/` → inspect its `🎫 Resume Ticket`, report the exact state in 3 lines, and resume without re-inventing or breaking prior code. If several dossiers are active and none is named or focused, list them and ask.
-   - **Archival:** When every Atomic Task of a phase is verified, move the dossier from `docs/plans/active/<module>/` to `docs/plans/completed/<module>/` and update statuses in the Module Blueprint and Project Roadmap.
+4. **The `"Tiếp tục"` State Machine, Crash Recovery & Archival Engine:**
+   - **Write-Ahead & End-of-Turn Checkpointing:** Mark the `🎫 Resume Ticket` as `IN_PROGRESS` with the target Atomic Task ID **before** editing code, and update it with verification results, line numbers, and the **Immediate Next Atomic Action** before yielding any turn. Run `python scripts/validate_plans.py --fix` whenever phase status or focus changes.
+   - **3-Step Crash / Dirty-State Recovery (When App Closes Mid-Task):** Whenever resuming via `"tiếp tục"` (or `"continue"`), NEVER trust the `🎫 Resume Ticket` blindly. Inspect: (1) the first unchecked `- [ ]` Atomic Task in the active dossier, (2) `git status` / `git diff` inside the module's `Code Root`, and (3) the target files on disk:
+     - *If target files were modified by an interrupted turn and tests already PASS:* check off `[x]`, update the `🎫 Resume Ticket`, report recovery, and execute the next unchecked Atomic Task.
+     - *If target files are partially written or failing tests from a mid-turn crash:* report the exact interrupted file/line in 3 lines and finish that exact Atomic Task without duplicating code.
+   - **Sequential `"Tiếp tục"` Execution:** When the active phase has remaining unchecked `- [ ]` Atomic Tasks and the user inputs `"tiếp tục"` (or `"continue"`, `"tiếp tục <MOD>"`), automatically execute the **next sequential unchecked Atomic Task** in that phase.
+   - **Final Task of a Phase & Phase Boundary Hard Stop:**
+     - On the turn that completes the **final** Atomic Task of a phase (`<MOD>-P<NN>`), check off `[x]`, set `Lifecycle Status` to `PHASE_COMPLETED`, and announce: *"Đã hoàn thành toàn bộ Atomic Tasks của Phase `<MOD>-P<NN>`. Vui lòng nhập `tiếp tục phase <MOD>-P<NN+1>` để lưu trữ phase hiện tại và chuyển sang phase kế tiếp."*
+     - **Hard Stop Guardrail:** When a phase has 0 unchecked tasks left (`PHASE_COMPLETED`), if the user inputs plain `"tiếp tục"`, **DO NOT** advance to the next phase. Report that `<MOD>-P<NN>` is out of tasks and require the explicit command `"tiếp tục phase <MOD>-P<NN+1>"`.
+   - **Automatic Phase Transition (`"tiếp tục phase <MOD>-P<NN+1>"`):** When the user explicitly inputs `"tiếp tục phase <MOD>-P<NN+1>"` (or `"tiếp tục phase <NN+1>"`), in that single turn the agent MUST:
+     1. Move the completed dossier from `docs/plans/active/<module-slug>/phase-<NN>-*.md` to `docs/plans/completed/<module-slug>/phase-<NN>-*.md`.
+     2. Activate `docs/plans/active/<module-slug>/phase-<NN+1>-*.md` (`Lifecycle Status: IN_PROGRESS`) and run `python scripts/validate_plans.py --fix` to synchronize `docs/modules-spec/<module-slug>.md` and the `Active Work Pointer` in `docs/plans/system-roadmap.md`.
+     3. Immediately execute the **first Atomic Task (`<MOD>-P<NN+1>.1.1`)** of the newly activated phase.
 <!-- HARNESS:END -->

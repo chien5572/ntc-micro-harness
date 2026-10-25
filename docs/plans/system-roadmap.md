@@ -7,7 +7,7 @@
 
 <!--
 Instantiated from docs/templates/system-roadmap-template.md. Populated during Gate 2.
-STRUCTURE INVARIANTS are checked by scripts/validate-plans.ps1 (see the template for details).
+STRUCTURE INVARIANTS are checked by scripts/validate_plans.py (see the template for details).
 -->
 
 ---
@@ -19,9 +19,9 @@ STRUCTURE INVARIANTS are checked by scripts/validate-plans.ps1 (see the template
 
 ## 2. Module Registry
 
-| Code | Slug | Responsibility | Code Root | Blueprint | Depends On | Status |
+| Code | Slug | Responsibility | Code Root | Module Spec | Depends On | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `SYS` | `system` | Cross-cutting: shared contracts package, local orchestration, CI, gateway, E2E tests | *[To be defined]* | `docs/plans/modules/system.md` | — | `PLANNED` |
+| `SYS` | `system` | Cross-cutting: shared contracts package, local orchestration, CI, gateway, E2E tests | *[To be defined]* | `docs/modules-spec/system.md` | — | `PLANNED` |
 | *[Additional modules to be populated from SPEC.md]* | | | | | | |
 
 ---
@@ -42,7 +42,7 @@ STRUCTURE INVARIANTS are checked by scripts/validate-plans.ps1 (see the template
 ## 5. Active Work Pointer
 - **Current Stage:** Gate 1 (Awaiting `SPEC.md`)
 - **Current Focus:** None
-- **Planning Item In Review (Gate 2/3 only):** None
+- **Planning Item In Review (Gate 2/3/4 only):** None
 
 | Module | Active Dossier | Lifecycle Status |
 | :--- | :--- | :--- |
