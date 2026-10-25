@@ -1,5 +1,11 @@
 # NTC Micro Harness: Atomic Engineering Protocol (Microservices Edition v2.0)
 
+<p align="center">
+  <strong>🌐 Language / Ngôn ngữ:</strong>
+  <strong>🇺🇸 English (Current)</strong> |
+  <a href="README.vi.md">🇻🇳 Tiếng Việt</a>
+</p>
+
 [![CI Validation](https://github.com/chien5572/ntc-micro-harness/actions/workflows/validate.yml/badge.svg)](https://github.com/chien5572/ntc-micro-harness/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Protocol Version](https://img.shields.io/badge/Harness-v2.0.0-green.svg)](AGENTS.md)
