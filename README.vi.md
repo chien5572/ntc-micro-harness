@@ -351,12 +351,12 @@ Mỗi lần bạn gõ `"tiếp tục"`, AI sẽ tự động:
 2. Cập nhật `🎫 Resume Ticket` sang `IN_PROGRESS` với mã Atomic Task đang làm (Write-Ahead).
 3. **Nếu task có `UI Prototype Reference` (`SCR-<MOD>-<NN>`):** Đọc ngay file `.html` prototype đã duyệt trong `docs/prototypes/<module-slug>/`, bê nguyên 1:1 cấu trúc DOM, CSS/Tailwind classes, các trạng thái (`default`/`loading`/`empty`/`error`) và các thuộc tính `data-testid` sang Component thực tế.
 4. Chạy lệnh Unit Test / Component Test để chứng minh code chạy đúng (`Executable Proof`).
-5. Đánh dấu `- [x]`, cập nhật `🎫 Resume Ticket` trỏ sang Atomic Task kế tiếp, và dừng lại chờ bạn.
+5. Đánh dấu `- [x]`, cập nhật `🎫 Resume Ticket` trỏ sang Atomic Task kế tiếp, chạy `python scripts/validate_plans.py --fix`, và **tự động tạo một Atomic Git Commit checkpoint** (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <summary>"`) trước khi dừng lại chờ bạn.
 
 #### 3. Hoàn thành Task Cuối cùng của một Phase & Chốt Chặn An Toàn (Hard Stop)
 
 Ở lượt chạy hoàn thành **Atomic Task cuối cùng** của một phase (ví dụ `AUTH-P01`):
-- AI đánh dấu `- [x]` cho task cuối cùng đó và chuyển `Lifecycle Status` trong `🎫 Resume Ticket` sang **`PHASE_COMPLETED`**.
+- AI đánh dấu `- [x]` cho task cuối cùng đó, chuyển `Lifecycle Status` trong `🎫 Resume Ticket` sang **`PHASE_COMPLETED`**, và tạo `git commit` checkpoint.
 - AI thông báo rõ ràng:
   > *"Đã hoàn thành toàn bộ Atomic Tasks của Phase `AUTH-P01`. Vui lòng nhập `tiếp tục phase AUTH-P02` để lưu trữ phase hiện tại và chuyển sang phase kế tiếp."*
 - **Chốt chặn an toàn:** Khi một phase đã ở trạng thái `PHASE_COMPLETED` (không còn task `- [ ]` nào), nếu bạn vô tình gõ `"tiếp tục"` thông thường, AI **sẽ KHÔNG tự ý nhảy sang phase mới** mà dừng lại nhắc bạn nhập đúng lệnh chuyển phase.
@@ -374,7 +374,29 @@ Chỉ trong **1 lượt duy nhất đó**, AI sẽ tự động thực hiện tr
 1. Di chuyển file hồ sơ `docs/plans/active/auth/phase-01-*.md` sang thư mục lưu trữ `docs/plans/completed/auth/phase-01-*.md`.
 2. Kích hoạt file hồ sơ `docs/plans/active/auth/phase-02-*.md` (`Lifecycle Status: IN_PROGRESS`).
 3. Chạy `python scripts/validate_plans.py --fix` để tự động đồng bộ bảng tiến độ trong `docs/modules-spec/auth.md` và `Active Work Pointer` trong `docs/plans/system-roadmap.md`.
-4. Thực thi ngay **Atomic Task đầu tiên (`AUTH-P02.1.1`)** của phase mới!
+4. Thực thi ngay **Atomic Task đầu tiên (`AUTH-P02.1.1`)** của phase mới và tạo `git commit` checkpoint!
+
+#### 5. Pha Cuối `SYS`: Kiểm Thử Tích Hợp Liên Module & Full-Stack E2E (`SYS-P<FINAL>`)
+
+Sau khi tất cả các module nghiệp vụ và giao diện (`AUTH`, `ORD`, `WEB`...) đã hoàn thành các phase riêng và được lưu trữ vào `docs/plans/completed/<slug>/`, module `SYS` sẽ thực thi **Pha Khóa Đuôi (`SYS-P<FINAL>` ở Global Phase cuối cùng `GP-<FINAL>`)**:
+- Khởi chạy toàn bộ hệ thống thật (Database + Migrations + Message Broker + Backend Services + API Gateway + Frontend).
+- Chạy kiểm thử tích hợp hợp đồng liên module (`CT-*`) trực tiếp giữa các service thật (không dùng mock).
+- Chạy kiểm thử E2E toàn trình trên trình duyệt (Playwright/Cypress) bám theo đúng các neo **`data-testid="scr-<nn>-..."`** đã khóa trong `docs/prototypes/registry.md`: từ thao tác click trên Frontend $\rightarrow$ gọi API (`CT-*`) $\rightarrow$ lưu Database $\rightarrow$ cập nhật trạng thái giao diện (`default`, `loading`, `empty`, `error`).
+
+#### 6. Yêu Cầu Thay Đổi Giữa Chừng (Mid-Flight Change Request — `CR-<NN>`)
+
+Nếu đang ở Gate 5 mà bạn muốn **thêm tính năng mới, thay đổi luồng nghiệp vụ liên module, hoặc thêm/sửa màn hình UI**, bạn chỉ cần gõ:
+
+```text
+yêu cầu thay đổi: <mô tả tính năng mới, thay đổi API hoặc màn hình UI muốn thêm/sửa>
+```
+*(Hoặc `"change request: <mô tả>"`).*
+
+AI sẽ **tuyệt đối không** sửa đè hay bỏ tích `[x]` các task đã làm xong hoặc các hồ sơ đã lưu trong `docs/plans/completed/`. Thay vào đó, AI tự động chạy **Quy trình Mở Khóa Ngược Delta 4 Bước (`CR-<NN>`)**:
+1. **Đóng băng & Phân tích Phạm vi Ảnh hưởng (Delta Audit):** Tạm dừng viết code Gate 5, ghi nhận mã `CR-<NN>` (ví dụ `CR-01`) vào bảng `## 6. Change Request (CR) Log` trong `docs/plans/system-roadmap.md` và xác định các hợp đồng `CT-*`, màn hình `SCR-*`, và module bị ảnh hưởng.
+2. **Cập nhật Delta UI Prototype & Contract trước:** Chỉ tạo mới hoặc cập nhật các file `.html` prototype bị ảnh hưởng trong `docs/prototypes/<slug>/` để bạn mở trình duyệt duyệt (`APPROVED`), đồng thời cập nhật `docs/plans/contract-registry.md`.
+3. **Bổ sung nối tiếp (Append-Only) vào Spec & Phase Dossier:** Cập nhật các file `docs/modules-spec/<slug>.md` liên quan và nối thêm Major/Atomic Tasks vào hồ sơ pha đang mở — hoặc tự động tạo một **Hồ sơ Pha Delta mới (`phase-<NN+1>-cr-<nn>-*.md`)** trong `docs/plans/active/<slug>/` nếu toàn bộ các pha trước của module đó đã đóng vào `completed/`.
+4. **Kiểm tra & Tiếp tục Gate 5:** Chạy `python scripts/validate_plans.py --fix`, `git commit` kế hoạch Delta, và sẵn sàng để bạn gõ `"tiếp tục"` chạy tiếp ngay!
 
 ---
 
@@ -394,21 +416,23 @@ Chỉ trong **1 lượt duy nhất đó**, AI sẽ tự động thực hiện tr
 
 ## 6. Khôi phục Sự cố Giữa Chừng & Chạy Song Song Đa Agent (Git Worktree)
 
-### 6.1 Khôi phục Sự cố Tắt Máy / Đóng App Giữa Chừng (3-Step Crash Recovery)
+### 6.1 Tự động Git Commit Checkpoint & Khôi phục Sự cố 3 Bước (3-Step Crash Recovery)
 
-Nếu đang chạy dở một Atomic Task mà IDE bị treo, mất điện hoặc mất mạng giữa chừng, khi mở lại dự án bạn chỉ cần gõ:
+Nhờ quy tắc **tự động `git commit` sau mỗi Atomic Task hoàn thành (`[x]`)**, nhánh `HEAD` trên Git luôn là điểm neo sạch đã pass test 100%. Nếu đang chạy dở một Atomic Task mà IDE bị treo, mất điện hoặc mất mạng giữa chừng, **mọi thay đổi chưa commit trong `git status` / `git diff HEAD` chắc chắn 100% thuộc về đúng Atomic Task đang bị ngắt quãng đó** (không bao giờ bị lẫn với các task đã làm xong trước đó).
+
+Khi mở lại dự án, bạn chỉ cần gõ:
 
 ```text
 tiếp tục
 ```
 
-Trước khi sửa bất kỳ file nào, AI bắt buộc thực hiện **3 bước đối soát thực tế trên ổ đĩa**:
+Trước khi sửa bất kỳ file nào, AI bắt buộc thực hiện **3 bước đối soát thực tế so với `HEAD`**:
 1. **Đọc Hồ sơ Pha đang mở:** Xác định Atomic Task `- [ ]` đầu tiên chưa tích chọn và danh sách `Target Files` của task đó.
-2. **Kiểm tra Cây thư mục Git (`git status` & `git diff`):** Kiểm tra xem các file mục tiêu trong `Code Root` của module đã bị sửa đổi gì trước khi sập máy chưa.
+2. **Kiểm tra Cây thư mục Git so với `HEAD` (`git status --short` & `git diff HEAD`):** Kiểm tra xem các file mục tiêu trong `Code Root` của module đã bị sửa đổi gì so với commit `HEAD` gần nhất chưa.
 3. **Tự động xử lý thông minh:**
-   - **Trường hợp 1 (Chưa có file nào bị sửa):** Thực thi Atomic Task đó từ đầu như bình thường.
-   - **Trường hợp 2 (Code đã được viết xong trước khi sập máy và chạy Test PASS):** Tự động tích chọn `- [x]` cho task đó, ghi nhận khôi phục vào nhật ký, và chuyển sang làm luôn Atomic Task kế tiếp ngay trong lượt đó.
-   - **Trường hợp 3 (Code đang viết dở dang hoặc Test đang FAIL):** Báo cáo ngắn gọn 3 dòng (*Module/Phase/Task đang dở, file/dòng bị ngắt quãng, và hướng xử lý*), sau đó **viết nốt phần logic còn thiếu** của đúng Atomic Task đó mà không làm mất hay nhân đôi code đã viết.
+   - **Trường hợp 1 (Chưa có file nào bị sửa so với `HEAD`):** Thực thi Atomic Task đó từ đầu như bình thường và `git commit` ở cuối lượt.
+   - **Trường hợp 2 (Code đã được viết xong trước khi sập máy và chạy Test PASS):** Tự động tích chọn `- [x]` cho task đó, tạo bù bản `git commit` checkpoint cho task vừa khôi phục, ghi nhận vào nhật ký, và chuyển sang làm luôn Atomic Task kế tiếp ngay trong lượt đó.
+   - **Trường hợp 3 (Code đang viết dở dang hoặc Test đang FAIL):** Báo cáo ngắn gọn 3 dòng (*Module/Phase/Task đang dở, file/dòng bị ngắt quãng so với `HEAD`, và hướng xử lý*), sau đó **viết nốt phần logic còn thiếu** của đúng Atomic Task đó mà không làm mất hay nhân đôi code đã viết.
 
 ---
 
@@ -521,6 +545,7 @@ python scripts/validate_plans.py --fix
 | **Tác vụ Bổ sung Động (Hotfix)** | `<MOD>-P<NN>.<M>.<A>[a-z]` | `AUTH-P01.2.3a` | `docs/plans/active/auth/phase-01-*.md` |
 | **Hợp đồng Liên Module (Contract)** | `CT-<PROVIDER>-<NN>` | `CT-AUTH-01` | `docs/plans/contract-registry.md` |
 | **Nguyên mẫu Màn hình (UI Prototype)** | `SCR-<MOD>-<NN>` | `SCR-WEB-01` | `docs/prototypes/registry.md` (`docs/prototypes/<slug>/scr-<nn>-*.html`) |
+| **Yêu cầu Thay đổi Giữa chừng (Change Request)** | `CR-<NN>` | `CR-01` | `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) |
 
 ---
 

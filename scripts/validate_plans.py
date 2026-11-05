@@ -44,6 +44,7 @@ GLOBAL_STATUSES = {"PENDING", "ACTIVE", "COMPLETED"}
 PHASE_STATUSES = {"PENDING", "ACTIVE", "BLOCKED", "COMPLETED"}
 CONTRACT_STATUSES = {"DRAFT", "AVAILABLE", "DEPRECATED"}
 PROTOTYPE_STATUSES = {"DRAFT", "APPROVED", "DEPRECATED"}
+CR_STATUSES = {"IN_REVIEW", "APPROVED", "COMPLETED"}
 CONTRACT_TYPES = {"REST", "gRPC", "Event", "Schema", "Library"}
 LIFECYCLE_STATUSES = {
     "PENDING",
@@ -760,9 +761,11 @@ class Validator:
             if gp is not None:
                 _, rows, label = gp
                 seen_gp: Dict[str, bool] = {}
+                non_placeholder_gp_rows: List[Dict[str, str]] = []
                 for row in rows:
                     if self.is_placeholder(row["GP"]):
                         continue
+                    non_placeholder_gp_rows.append(row)
                     gid = self.clear_cell(row["GP"])
                     where = f"{label} row '{gid}'"
                     if not re.match(r"^GP-\d{2}$", gid):
@@ -811,6 +814,17 @@ class Validator:
                                     f"marked COMPLETED but '{m.group(0)}' has no dossier in docs/plans/completed/{code_to_slug[m_code]}/",
                                     "A global phase completes only when all its module phases are archived.",
                                 )
+                if len(code_to_slug) > 1 and len(non_placeholder_gp_rows) >= 2:
+                    last_gp_row = non_placeholder_gp_rows[-1]
+                    last_gp_id = self.clear_cell(last_gp_row["GP"])
+                    last_phases = last_gp_row["Participating Module Phases"]
+                    if not re.search(r"\bSYS-P\d{2}\b", last_phases):
+                        self.add_warning(
+                            "SYS_E2E_BOOKEND",
+                            f"{label} row '{last_gp_id}'",
+                            f"final Global Phase '{last_gp_id}' does not include a closing SYS-P<NN> Cross-Module Integration & Full-Stack E2E phase",
+                            "Include a closing SYS-P<NN> phase in the final Global Phase to verify live Frontend <-> Backend <-> DB E2E flows.",
+                        )
 
         # 6. active/ and completed/ layout + dossier content
         active_dossiers: List[str] = []
@@ -1189,6 +1203,50 @@ class Validator:
                         "missing '- **Current Focus:**'",
                         "Restore the field from docs/templates/system-roadmap-template.md.",
                     )
+
+            # 9. Change Request (CR) Log (if present in docs/plans/system-roadmap.md)
+            found_cr, cr_lines = self.get_section(self.read_lines(roadmap_rel), r"^## 6\.\s*Change Request \(CR\) Log")
+            if found_cr:
+                found_cr_tbl, cr_headers, cr_rows = self.parse_table(cr_lines)
+                if found_cr_tbl and "CR ID" in cr_headers and "Status" in cr_headers:
+                    seen_cr: Dict[str, bool] = {}
+                    for row in cr_rows:
+                        if self.is_placeholder(row["CR ID"]):
+                            continue
+                        cr_id = self.clear_cell(row["CR ID"])
+                        where_cr = f"{roadmap_rel} (## 6. Change Request (CR) Log) row '{cr_id}'"
+                        if not re.match(r"^CR-\d{2}$", cr_id):
+                            self.add_violation(
+                                "CR_ID",
+                                where_cr,
+                                f"Change Request ID '{cr_id}' does not match CR-<NN>",
+                                "Use a valid ID such as CR-01.",
+                            )
+                            continue
+                        if cr_id in seen_cr:
+                            self.add_violation(
+                                "CR_DUPLICATE",
+                                where_cr,
+                                f"Change Request '{cr_id}' is registered twice",
+                                "CR IDs must be unique.",
+                            )
+                        seen_cr[cr_id] = True
+                        cr_status = self.clear_cell(row["Status"])
+                        if cr_status not in CR_STATUSES:
+                            self.add_violation(
+                                "CR_STATUS",
+                                where_cr,
+                                f"status '{cr_status}' is not one of {' | '.join(sorted(CR_STATUSES))}",
+                                "Use IN_REVIEW, APPROVED, or COMPLETED.",
+                            )
+                        for m_mod in re.finditer(r"\b([A-Z]{2,5})-P(\d{2})\b", row.get("Impacted Modules & Phases", "")):
+                            if slug_to_code and m_mod.group(1) not in code_to_slug:
+                                self.add_violation(
+                                    "CR_MODULE",
+                                    where_cr,
+                                    f"references unregistered module '{m_mod.group(1)}'",
+                                    "Register the module in ## 2. Module Registry first.",
+                                )
 
         # Report
         print(f"Harness plan validation (v2.0): {self.root}")

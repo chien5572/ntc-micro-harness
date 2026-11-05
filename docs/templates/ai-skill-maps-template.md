@@ -48,7 +48,7 @@ All approved project skills are installed locally under `.agents/skills/`:
   - At the start of every session or when receiving `"tiếp tục"`, `"tiếp tục <MOD>"`, or `"tiếp tục phase <MOD>-P<NN>"`.
   - During Gate 4 (Phase Dossier WBS generation) and Gate 5 (Atomic Task implementation).
   - Before concluding any turn to update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix`.
-- **Core Enforcement:** Locks `1 Turn = 1 Atomic Task`, `Contract-First`, `1:1 UI Prototype Parity (SCR-<MOD>-<NN> + data-testid)`, `No-Stubbing`, 3-Step Crash Recovery, and the Phase Boundary Hard Stop on `"tiếp tục"`.
+- **Core Enforcement:** Locks `1 Turn = 1 Atomic Task`, `Contract-First`, `1:1 UI Prototype Parity (SCR-<MOD>-<NN> + data-testid)`, `No-Stubbing`, **End-of-Turn Atomic Git Commit Checkpointing**, 3-Step Crash Recovery against `HEAD`, the **4-Step Delta Reverse-Unlock Protocol (`CR-<NN>`)** for mid-flight change requests, and the Phase Boundary Hard Stop on `"tiếp tục"`.
 
 #### 2) `<project>-domain-invariants`
 - **File:** [`.agents/skills/<project>-domain-invariants/SKILL.md`](.agents/skills/<project>-domain-invariants/SKILL.md)

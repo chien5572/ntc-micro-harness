@@ -11,15 +11,16 @@
 ---
 
 ## 🎫 Resume Ticket (Instant State Checkpoint)
-<!-- AGENT INVARIANT: Update to IN_PROGRESS BEFORE editing code (write-ahead), and update before concluding ANY turn. -->
+<!-- AGENT INVARIANT: Update to IN_PROGRESS BEFORE editing code (write-ahead), and update + git commit before concluding ANY turn. -->
 - **Module:** `<MOD>`
 - **Lifecycle Status:** `PENDING` | `READY_TO_EXECUTE` | `IN_PROGRESS` | `BLOCKED_BY_DEPENDENCY` | `INTERRUPTED` | `PHASE_COMPLETED`
 - **Active Major Task:** Major Task <MOD>-P<NN>.1 - <Major Task Name>
 - **Active Atomic Task:** Atomic Task <MOD>-P<NN>.1.1 - <Atomic Task Name>
+- **Last Committed Checkpoint (`HEAD`):** `<MOD>-P<NN>.1.1` (`commit <hash>`) *(or `None — first task in phase`)*
 - **In-flight File & Location:** `services/<module-slug>/src/service.ts:42`
 - **Current Context / State:** Parsing logic completed; currently implementing repository calls; unit test `services/<module-slug>/tests/service.spec.ts` passing/failing at case Y.
 - **Immediate Next Atomic Action (When resuming):**
-  Execute Atomic Task `<MOD>-P<NN>.1.2` in `services/<module-slug>/src/service.ts`, then run `npm test --prefix services/<module-slug>`.
+  Execute Atomic Task `<MOD>-P<NN>.1.2` in `services/<module-slug>/src/service.ts`, run `npm test --prefix services/<module-slug>`, and create an atomic git commit checkpoint.
 
 ---
 
@@ -66,8 +67,9 @@
 
 > **Execution & `"Tiếp tục"` State Machine Rule:**
 > - **1 Chat Turn = Execute EXACTLY 1 Atomic Task**, inside this module's `Code Root` only.
-> - **When user types `"tiếp tục"`:** Reconcile working tree (3-Step Crash Recovery), then execute the next sequential unchecked `- [ ]` Atomic Task.
-> - **When completing the LAST Atomic Task of this phase:** Check off `[x]`, set `Lifecycle Status: PHASE_COMPLETED`, and announce that all tasks of `<MOD>-P<NN>` are done and the user must enter `"tiếp tục phase <MOD>-P<NN+1>"` to transition.
+> - **Atomic Git Commit Checkpoint:** After the task's `Executable Proof Command` passes, mark `- [x]`, update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and commit (`git add <code-root> docs/plans/ docs/modules-spec/ && git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <summary>"`).
+> - **When user types `"tiếp tục"`:** Reconcile working tree against `HEAD` (3-Step Crash Recovery), then execute the next sequential unchecked `- [ ]` Atomic Task.
+> - **When completing the LAST Atomic Task of this phase:** Check off `[x]`, set `Lifecycle Status: PHASE_COMPLETED`, commit checkpoint, and announce that all tasks of `<MOD>-P<NN>` are done and the user must enter `"tiếp tục phase <MOD>-P<NN+1>"` to transition.
 > - **Hard Stop:** Never advance to `<MOD>-P<NN+1>` on plain `"tiếp tục"`. Only on `"tiếp tục phase <MOD>-P<NN+1>"` do you archive this dossier to `docs/plans/completed/<module-slug>/`, run `python scripts/validate_plans.py --fix`, activate `<MOD>-P<NN+1>`, and execute `<MOD>-P<NN+1>.1.1`.
 
 ### Atomic Task <MOD>-P<NN>.1.1: [Task Name]
@@ -81,5 +83,5 @@
 ---
 
 ## 4. Execution Evidence & Verification Log
-*(Record diagnostic proof and test output after each atomic task)*
-- **Atomic Task <MOD>-P<NN>.1.1:** PASS - [Log / Test result snippet]
+*(Record diagnostic proof, test output, and the atomic git commit hash after each atomic task)*
+- **Atomic Task <MOD>-P<NN>.1.1:** PASS (`commit <hash>`) - [Log / Test result snippet]

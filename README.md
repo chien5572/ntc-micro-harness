@@ -359,12 +359,12 @@ On each `"tiếp tục"`, the agent automatically:
 2. Marks the target Atomic Task `IN_PROGRESS` (Write-Ahead).
 3. **If the task has a `UI Prototype Reference` (`SCR-<MOD>-<NN>`):** Reads the approved `docs/prototypes/<module-slug>/scr-<nn>-*.html` file and ports its DOM hierarchy, CSS/Tailwind tokens, states (`default`/`loading`/`empty`/`error`), and `data-testid` attributes **1:1** into the component.
 4. Executes the unit/component test command (`Executable Proof`).
-5. Marks `- [x]` on the task, updates the `🎫 Resume Ticket` with the next Atomic Task ID, and stops cleanly.
+5. Marks `- [x]` on the task, updates the `🎫 Resume Ticket` with the next Atomic Task ID, runs `python scripts/validate_plans.py --fix`, and **automatically creates an Atomic Git Commit checkpoint** (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <summary>"`) before stopping cleanly.
 
 #### 3. Completing the Final Task of a Phase & The Hard Stop Guardrail
 
 When the agent finishes the **last unchecked Atomic Task** of `<MOD>-P<NN>` (e.g., `AUTH-P01`):
-- It marks `- [x]` on the final task and sets `Lifecycle Status: PHASE_COMPLETED` in the `🎫 Resume Ticket`.
+- It marks `- [x]` on the final task, sets `Lifecycle Status: PHASE_COMPLETED` in the `🎫 Resume Ticket`, and creates the atomic git commit checkpoint.
 - It outputs the mandatory completion announcement:
   > *"Đã hoàn thành toàn bộ Atomic Tasks của Phase `AUTH-P01`. Vui lòng nhập `tiếp tục phase AUTH-P02` để lưu trữ phase hiện tại và chuyển sang phase kế tiếp."*
 - **Hard Stop Protection:** If you accidentally type plain `"tiếp tục"` when `AUTH-P01` is already `PHASE_COMPLETED`, the agent **will NOT start `AUTH-P02`**. It will stop and remind you to enter the explicit phase transition command.
@@ -382,7 +382,29 @@ In that **single turn**, the agent automatically:
 1. Moves `docs/plans/active/auth/phase-01-*.md` → `docs/plans/completed/auth/phase-01-*.md`.
 2. Activates `docs/plans/active/auth/phase-02-*.md` (`Lifecycle Status: IN_PROGRESS`).
 3. Runs `python scripts/validate_plans.py --fix` to synchronize the Module Phase Sequence table in `docs/modules-spec/auth.md` and the `Active Work Pointer` in `docs/plans/system-roadmap.md`.
-4. Immediately executes the **first Atomic Task (`AUTH-P02.1.1`)** of the new phase!
+4. Immediately executes the **first Atomic Task (`AUTH-P02.1.1`)** of the new phase and commits the checkpoint!
+
+#### 5. Closing `SYS` Cross-Module Integration & Full-Stack E2E Gate (`SYS-P<FINAL>`)
+
+Once all individual domain and UI module phases (`AUTH`, `ORD`, `WEB`, ...) are completed and archived in `docs/plans/completed/<slug>/`, execute the closing **`SYS` Integration & E2E Phase** (`SYS-P<FINAL>` in the final Global Phase `GP-<FINAL>`):
+- Boots the real multi-service / modular-monolith topology (real database migrations, message brokers, backend services, API gateway, and frontend build).
+- Executes live cross-module contract (`CT-*`) round-trip integration tests with zero mocks.
+- Runs automated Full-Stack E2E browser journeys (e.g., Playwright) targeting the locked **`data-testid="scr-<nn>-..."` anchors** from `docs/prototypes/registry.md` across Frontend ↔ Backend API ↔ Database.
+
+#### 6. Mid-Flight Change Requests & Scope Evolution (`CR-<NN>` / `"yêu cầu thay đổi: ..."`)
+
+Need to add a new feature, modify a cross-module flow, or add/change a UI screen while already in Gate 5? Simply enter:
+
+```text
+yêu cầu thay đổi: <describe the new feature, contract change, or UI screen>
+```
+*(Or `"change request: <description>"`).*
+
+The agent will **never** overwrite or uncheck completed `[x]` tasks or archived dossiers in `docs/plans/completed/`. Instead, it executes the **4-Step Delta Reverse-Unlock Protocol (`CR-<NN>`)**:
+1. **Freeze & Impact Audit:** Pauses Gate 5 coding, logs `CR-<NN>` in `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`), and identifies impacted modules, contracts (`CT-*`), and UI screens (`SCR-*`).
+2. **Delta UI Prototype & Contract Lock:** Creates/updates only the affected HTML prototypes in `docs/prototypes/<slug>/scr-*.html` for your visual approval (`APPROVED`) and updates `docs/plans/contract-registry.md`.
+3. **Append-Only Spec & WBS Amendment:** Updates affected `docs/modules-spec/<slug>.md` files and appends new Major/Atomic Tasks to active dossiers — or creates a new **Delta Phase Dossier (`phase-<NN+1>-cr-<nn>-*.md`)** if previous phases of that module were already archived in `completed/`.
+4. **Validate & Resume:** Runs `python scripts/validate_plans.py --fix`, commits the planning delta, and lets you resume coding immediately with `"tiếp tục"`.
 
 ---
 
@@ -402,22 +424,22 @@ To prevent AI agents from ignoring or drifting away from the UI prototype you ap
 
 ## 6. Crash Recovery & Multi-Agent Parallel Execution
 
-### 6.1 3-Step Mid-Turn Crash & Dirty-State Recovery
+### 6.1 Atomic Git Commit Checkpointing & 3-Step Mid-Turn Crash Recovery
 
-What happens if your IDE crashes, your laptop loses power, or the network drops **in the middle of an Atomic Task**?
+Because every completed `[x]` Atomic Task is automatically committed to Git (`HEAD`) at the end of its turn, **`HEAD` is always a verified, test-passing checkpoint**. If your IDE crashes, your laptop loses power, or the network drops **in the middle of an Atomic Task**, any uncommitted modification in `git status` / `git diff HEAD` belongs **100% to that single interrupted task**.
 
 Simply reopen your editor and type:
 ```text
 tiếp tục
 ```
 
-Before writing a single line of code, the agent executes the **3-Step Crash Recovery Protocol**:
+Before writing a single line of code, the agent executes the **3-Step Crash Recovery Protocol against `HEAD`**:
 1. **Inspects the Active Dossier:** Locates the first unchecked `- [ ]` Atomic Task and its declared `Target Files` and `Executable Proof Command`.
-2. **Inspects Git Working Tree:** Runs `git status --short` and `git diff` scoped to the module's `Code Root`.
+2. **Inspects Git Working Tree vs. `HEAD`:** Runs `git status --short` and `git diff HEAD` scoped to the module's `Code Root`.
 3. **Deterministic Reconciliation:**
-   - **Case A — Clean Working Tree:** The crash occurred before any file was written. The agent executes the Atomic Task cleanly from scratch.
-   - **Case B — Code Completed Before Crash & Tests Pass:** The agent runs the `Executable Proof Command`. If all tests already pass, it checks off `- [x]`, logs the recovery in the dossier's Execution Log, and immediately executes the **next** unchecked Atomic Task in the same turn.
-   - **Case C — Partially Written / Failing Tests:** The agent outputs a concise 3-line recovery report identifying the exact interrupted file/line and completes the remaining code of that exact Atomic Task without duplicating work.
+   - **Case A — Clean Working Tree (Relative to `HEAD`):** The crash occurred before any file was written. The agent executes the Atomic Task cleanly from scratch and commits at the end of the turn.
+   - **Case B — Code Completed Before Crash & Tests Pass:** The agent runs the `Executable Proof Command`. If all tests already pass, it checks off `- [x]`, creates the missing atomic git commit for that task, logs the recovery in the dossier's Execution Log, and immediately executes the **next** unchecked Atomic Task in the same turn.
+   - **Case C — Partially Written / Failing Tests:** The agent outputs a concise 3-line recovery report identifying the exact interrupted file/line relative to `HEAD` and completes the remaining code of that exact Atomic Task without duplicating work.
 
 ---
 
@@ -532,6 +554,7 @@ python scripts/validate_plans.py --fix
 | **Dynamic Hotfix Task** | `<MOD>-P<NN>.<M>.<A>[a-z]` | `AUTH-P01.2.3a` | `docs/plans/active/auth/phase-01-*.md` |
 | **Cross-Module Contract** | `CT-<PROVIDER>-<NN>` | `CT-AUTH-01` | `docs/plans/contract-registry.md` |
 | **UI Screen Prototype** | `SCR-<MOD>-<NN>` | `SCR-WEB-01` | `docs/prototypes/registry.md` (`docs/prototypes/<slug>/scr-<nn>-*.html`) |
+| **Mid-Flight Change Request** | `CR-<NN>` | `CR-01` | `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) |
 
 ---
 

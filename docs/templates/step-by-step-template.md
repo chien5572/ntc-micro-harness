@@ -77,7 +77,7 @@ Căn cứ vào:
 - @docs/plans/active/system/phase-01-<slug>.md
 
 Hãy kích hoạt Phase `SYS-P01` và thực thi DUY NHẤT Atomic Task đầu tiên (`SYS-P01.1.1`).
-Chạy kiểm chứng thực tế (Executable Proof), tick `[x]`, cập nhật `🎫 Resume Ticket` và dừng lại báo cáo.
+Chạy kiểm chứng thực tế (Executable Proof), tick `[x]`, cập nhật `🎫 Resume Ticket`, chạy `python scripts/validate_plans.py --fix`, tạo Atomic Git Commit checkpoint (`git commit -m "feat(system): complete SYS-P01.1.1 ..."`), và dừng lại báo cáo.
 ```
 
 ---
@@ -88,14 +88,14 @@ Chạy kiểm chứng thực tế (Executable Proof), tick `[x]`, cập nhật `
 ```text
 Tôi muốn bắt đầu triển khai Gate 5 cho Module <MOD> (`<module-slug>`) độc lập ở tab này, bắt đầu từ Phase `<MOD>-P01`.
 Căn cứ vào:
-- @AGENTS.md (Chỉ tạo/sửa code trong `<code-root>` và hồ sơ trong `docs/plans/active/<module-slug>/`; 1 Turn = 1 Atomic Task; Bảo toàn 1:1 UI Prototype nếu là task UI)
+- @AGENTS.md (Chỉ tạo/sửa code trong `<code-root>` và hồ sơ trong `docs/plans/active/<module-slug>/`; 1 Turn = 1 Atomic Task; Bảo toàn 1:1 UI Prototype nếu là task UI; Tự động Git Commit sau mỗi Atomic Task)
 - @ai-skill-maps.md (BẮT BUỘC đọc và áp dụng các skill: `atomic-harness-gatekeeper`, `<project>-domain-invariants`, `<module-skills>`)
 - @docs/plans/contract-registry.md (các hợp đồng phụ thuộc đã AVAILABLE) và @docs/prototypes/registry.md (nếu module có UI: BẮT BUỘC đọc file `.html` prototype của `SCR-<MOD>-<NN>`, giữ nguyên 100% cấu trúc DOM, class/tokens, các trạng thái UI và `data-testid`)
 - @docs/modules-spec/<module-slug>.md
 - @docs/plans/active/<module-slug>/phase-01-<slug>.md
 
 Hãy kích hoạt Phase `<MOD>-P01` và thực thi DUY NHẤT Atomic Task đầu tiên (`<MOD>-P01.1.1`).
-Chạy test chứng minh (Executable Proof), tick `[x]`, cập nhật `🎫 Resume Ticket` và dừng lại báo cáo.
+Chạy test chứng minh (Executable Proof), tick `[x]`, cập nhật `🎫 Resume Ticket`, chạy `python scripts/validate_plans.py --fix`, tạo Atomic Git Commit checkpoint, và dừng lại báo cáo.
 ```
 
 #### 🌿 Option B: Isolated Git Worktree Prompt (Parallel Multi-Agent Mode)
@@ -108,27 +108,45 @@ A. Thiết lập Không gian làm việc Cô lập (Worktree):
 - Mọi thao tác tạo/sửa file chỉ được thực hiện bên trong worktree này, giới hạn trong `<code-root>` và `docs/plans/active/<module-slug>/`.
 
 B. Căn cứ Kỹ thuật & Kỹ năng Bắt buộc:
-- @AGENTS.md (1 Turn = 1 Atomic Task, 1:1 UI Prototype Parity, Crash Recovery, Phase Boundary Hard Stop)
+- @AGENTS.md (1 Turn = 1 Atomic Task, 1:1 UI Prototype Parity, Atomic Git Commit Checkpointing, Crash Recovery, Phase Boundary Hard Stop)
 - @ai-skill-maps.md (BẮT BUỘC đọc và áp dụng: `using-git-worktrees`, `atomic-harness-gatekeeper`, `<project>-domain-invariants`, `<module-skills>`)
 - @docs/plans/contract-registry.md và @docs/prototypes/registry.md (nếu module có UI: BẮT BUỘC đọc file `.html` prototype của `SCR-<MOD>-<NN>` và chuyển đổi 1:1 DOM/styles/`data-testid`)
 - @docs/modules-spec/<module-slug>.md
 - @docs/plans/active/<module-slug>/phase-01-<slug>.md
 
 C. Thực thi:
-- Kích hoạt Phase `<MOD>-P01` và thực thi DUY NHẤT Atomic Task đầu tiên (`<MOD>-P01.1.1`), chạy test chứng minh và cập nhật `🎫 Resume Ticket`.
+- Kích hoạt Phase `<MOD>-P01` và thực thi DUY NHẤT Atomic Task đầu tiên (`<MOD>-P01.1.1`), chạy test chứng minh, cập nhật `🎫 Resume Ticket`, và tạo Atomic Git Commit checkpoint.
 
 D. Nghiệm thu & Merge về Main (Khi hoàn thành toàn bộ các Phase của Module <MOD>):
-- Chạy full test suite của module, chạy `python scripts/validate_plans.py --fix`, commit gọn gàng, merge `feat/<module-slug>` vào `main` và xóa worktree.
+- Chạy full test suite của module, chạy `python scripts/validate_plans.py --fix`, merge `feat/<module-slug>` vào `main` và xóa worktree.
 ```
 
 ---
 
-## 4. Cheat Sheet Điều Khiển Vòng Lặp Thực Thi Gate 5 (Dành cho Người dùng)
+### Step 3: Final `SYS` Cross-Module Integration & Full-Stack E2E Gate (`SYS-P<FINAL>`)
 
-Sau khi đã phát lệnh bắt đầu Phase 01 của một Module ở Mục 3, bạn chỉ cần dùng **2 câu lệnh siêu ngắn** dưới đây để điều khiển Agent cho đến khi xong toàn bộ dự án:
+*(Chỉ thực hiện sau khi TẤT CẢ các Phase của các Module nghiệp vụ và Frontend đã hoàn thành và chuyển vào `docs/plans/completed/<slug>/`)*:
+
+```text
+Toàn bộ các Phase của các Module thành phần đã hoàn tất. Bắt đầu Pha Tích Hợp Liên Module & Kiểm Thử E2E Toàn Hệ Thống (`SYS-P<FINAL>`):
+Căn cứ vào:
+- @AGENTS.md và @docs/WORKFLOW.md (Mục 5.2: Closing SYS Cross-Module Integration & Full-Stack E2E Gate)
+- @ai-skill-maps.md
+- @docs/plans/contract-registry.md (toàn bộ `CT-*`) và @docs/prototypes/registry.md (toàn bộ `SCR-*` và các neo `data-testid`)
+- @docs/modules-spec/system.md và @docs/plans/active/system/phase-<FINAL>-<slug>.md
+
+Hãy kích hoạt Phase `SYS-P<FINAL>` và thực thi DUY NHẤT Atomic Task đầu tiên (`SYS-P<FINAL>.1.1`) để khởi chạy toàn bộ hệ thống thật (Database + Backend Services + Gateway + Frontend), kiểm thử tích hợp thật giữa các module (`CT-*` không dùng mock) và chạy kịch bản E2E nối từ thao tác UI (`data-testid="scr-..."`) -> API -> DB -> hiển thị trạng thái UI.
+Chạy kiểm chứng thực tế, tick `[x]`, cập nhật `🎫 Resume Ticket`, chạy `python scripts/validate_plans.py --fix` và tạo Atomic Git Commit checkpoint.
+```
+
+---
+
+## 4. Cheat Sheet Điều Khiển Vòng Lặp Thực Thi Gate 5 & Yêu Cầu Thay Đổi Giữa Chừng
+
+Sau khi đã phát lệnh bắt đầu Phase 01 của một Module ở Mục 3, bạn chỉ cần dùng các câu lệnh ngắn dưới đây để điều khiển Agent:
 
 | Tình huống | Câu lệnh bạn nhập | Hành động tự động của Agent |
 | :--- | :--- | :--- |
-| **1. Chạy các Atomic Task tiếp theo trong cùng Phase** | `tiếp tục` *(hoặc `tiếp tục <MOD>`)* | - Kiểm tra phục hồi nếu phiên trước bị tắt đột ngột (Crash Recovery).<br>- Thực thi **đúng 1 Atomic Task chưa làm (`[ ]`) tuần tự kế tiếp**.<br>- Chạy test, tick `[x]`, cập nhật `🎫 Resume Ticket` và dừng lại. |
-| **2. Khi hoàn thành Atomic Task cuối cùng của Phase `<MOD>-P01`** | *(Ở cuối turn của task cuối, Agent tự báo hết task Phase P01)*<br>Nếu bạn vẫn gõ `tiếp tục` ➔ **Agent sẽ từ chối và nhắc chuyển phase!** | Bạn nhập:<br>**`tiếp tục phase <MOD>-P02`** | - Tự động chuyển hồ sơ `phase-01-*.md` sang `docs/plans/completed/<module-slug>/`.<br>- Chạy `python scripts/validate_plans.py --fix` đồng bộ trạng thái.<br>- Kích hoạt `phase-02-*.md` và **thực thi luôn Atomic Task đầu tiên (`<MOD>-P02.1.1`)**! |
-| **3. Sau đó trong Phase `<MOD>-P02`** | `tiếp tục` | Lặp lại quy trình chạy từng Atomic Task của Phase 02 cho đến hết. |
+| **1. Chạy các Atomic Task tiếp theo trong cùng Phase** | `tiếp tục` *(hoặc `tiếp tục <MOD>`)* | - Đối soát `git status` / `git diff HEAD` để phục hồi nếu phiên trước bị tắt đột ngột (Crash Recovery).<br>- Thực thi **đúng 1 Atomic Task chưa làm (`[ ]`) tuần tự kế tiếp** (kèm port 1:1 UI Prototype nếu là task UI).<br>- Chạy test, tick `[x]`, cập nhật `🎫 Resume Ticket`, chạy `validate_plans.py --fix` và **tự động `git commit` tạo điểm lui an toàn**. |
+| **2. Khi hoàn thành Atomic Task cuối cùng của Phase `<MOD>-P01`** | *(Ở cuối turn của task cuối, Agent tự báo hết task Phase P01)*<br>Nếu bạn vẫn gõ `tiếp tục` ➔ **Agent sẽ từ chối và nhắc chuyển phase!** | Bạn nhập:<br>**`tiếp tục phase <MOD>-P02`** | - Tự động chuyển hồ sơ `phase-01-*.md` sang `docs/plans/completed/<module-slug>/`.<br>- Chạy `python scripts/validate_plans.py --fix` đồng bộ trạng thái.<br>- Kích hoạt `phase-02-*.md`, **thực thi luôn Atomic Task đầu tiên (`<MOD>-P02.1.1`)** và tạo `git commit` checkpoint! |
+| **3. Khi muốn thêm tính năng mới / sửa luồng / thêm màn hình UI giữa chừng ở Gate 5 (Change Request)** | **`yêu cầu thay đổi: <mô tả tính năng / màn hình muốn thêm hoặc sửa>`** | - Tạm dừng code Gate 5, cấp mã `CR-<NN>` vào `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) và phân tích phạm vi ảnh hưởng (Delta Blast Radius).<br>- Cập nhật trước UI Prototype (`SCR-*`) để bạn duyệt và cập nhật Contract (`CT-*`).<br>- Bổ sung phần thay đổi (Delta) vào `docs/modules-spec/<slug>.md` và nối thêm Major/Atomic Tasks vào hồ sơ pha đang mở (hoặc tạo hồ sơ Delta Phase mới `phase-<NN+1>-cr-<nn>-*.md` nếu các pha cũ đã đóng — **tuyệt đối không sửa lại hồ sơ đã `completed/`**).<br>- Chạy `python scripts/validate_plans.py --fix`, commit kế hoạch Delta và sẵn sàng để bạn gõ `tiếp tục`! |

@@ -29,8 +29,9 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 - Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
 - Note: `STEP-by-STEP.md` is strictly for the Human Architect; AI Agents must NOT read it.
 - Enforce the 5-Stage Gated Lifecycle: UI Prototypes (`docs/prototypes/<slug>/scr-*.html`, if UI Required) are approved in Gate 3.0 before all `docs/modules-spec/*.md` (3.1), `ai-skill-maps.md` (3.2), and `STEP-by-STEP.md` (3.3) are created; all Phase Dossiers across all modules are pre-generated in Gate 4 before any Gate 5 code is written.
-- In Gate 5: 1 Turn = 1 Atomic Task. For UI tasks referencing `SCR-<MOD>-<NN>`, read the approved HTML prototype and port its DOM, classes, states, and `data-testid` anchors 1:1. Perform 3-Step Crash Recovery on `"tiếp tục"`. Stop at the end of a phase and require `"tiếp tục phase <MOD>-P<NN+1>"` to archive and transition.
-- Update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix` before yielding.
+- In Gate 5: 1 Turn = 1 Atomic Task. For UI tasks referencing `SCR-<MOD>-<NN>`, read the approved HTML prototype and port its DOM, classes, states, and `data-testid` anchors 1:1. Perform 3-Step Crash Recovery against `HEAD` on `"tiếp tục"`. Stop at the end of a phase and require `"tiếp tục phase <MOD>-P<NN+1>"` to archive and transition.
+- After every verified Atomic Task, update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <summary>"`).
+- For mid-flight feature/screen changes during Gate 4/5 (`"yêu cầu thay đổi: ..."`), execute the 4-Step Delta Reverse-Unlock Protocol (`CR-<NN>`) without rewriting completed dossiers.
 <!-- HARNESS:END -->
 """,
     ".cursorrules": """# Cursor Agent Rules
@@ -41,7 +42,8 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 - Never read `STEP-by-STEP.md` (Human-Only Playbook).
 - Never write production code before Gate 5 (if UI Required, HTML prototypes in `docs/prototypes/` must be `APPROVED` in Gate 3.0; all `docs/modules-spec/*.md` and all `docs/plans/active/<slug>/phase-*.md` must exist first).
 - Implement exactly ONE Atomic Task per turn (`1 Turn = 1 Task`). For UI tasks, port the approved `SCR-<MOD>-<NN>` HTML prototype 1:1 (including `data-testid` hooks). Never output incomplete stubs.
-- Update the `🎫 Resume Ticket` in the active dossier before concluding any turn.
+- Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before concluding any turn.
+- On `"yêu cầu thay đổi: ..."`, follow the `CR-<NN>` 4-Step Delta Reverse-Unlock Protocol.
 <!-- HARNESS:END -->
 """,
     ".windsurfrules": """# Windsurf Cascade Rules
@@ -49,8 +51,8 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 <!-- HARNESS:BEGIN -->
 Adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
 - Read `SPEC.md`, `AGENTS.md`, `docs/prototypes/registry.md` (if UI), and `ai-skill-maps.md` (do not read `STEP-by-STEP.md`).
-- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity (`SCR-<MOD>-<NN>`), and the `"tiếp tục"` / `"tiếp tục phase ..."` state machine.
-- Update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix` before yielding.
+- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity (`SCR-<MOD>-<NN>`), `CR-<NN>` delta change control, and the `"tiếp tục"` / `"tiếp tục phase ..."` state machine.
+- Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before yielding.
 <!-- HARNESS:END -->
 """,
 }

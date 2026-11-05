@@ -93,7 +93,17 @@ Gate 3 executes in **four sequential sub-steps** (`Step 3.0` is conditional on w
 2. **Single-Module Scope:** The task modifies only its module's `Code Root` and its active dossier in `docs/plans/active/<module-slug>/`.
 3. **1:1 UI Prototype Parity Invariant (For UI Tasks):** Whenever an Atomic Task specifies a `UI Prototype Reference` (`SCR-<MOD>-<NN>`), the Agent **MUST** read the approved HTML prototype file (`docs/prototypes/<module-slug>/scr-<nn>-*.html`) and `docs/prototypes/registry.md` in that turn. The Agent must port the exact DOM hierarchy, CSS/Tailwind classes, visual tokens, interactive states (`default`, `loading`, `empty`, `error`), and `data-testid` attributes **1:1** into the framework component. Inventing unapproved layouts or dropping `data-testid` hooks is a protocol violation.
 4. **Executable Proof Invariant:** Every atomic task must be validated with real executable evidence (unit tests pass, component `data-testid` assertions pass, build succeeds, contract checks pass) before checking off `- [x]`.
-5. **The `"Tiếp tục"` (Continue) State Machine:**
+5. **Atomic Git Commit Checkpointing (Clean Rollback Point per Task):** At the end of every Atomic Task turn in Gate 5 — strictly AFTER the `Executable Proof Command` passes, `- [x]` is checked off, the `🎫 Resume Ticket` is updated, and `python scripts/validate_plans.py --fix` succeeds — the Agent **MUST** stage the module's changes and create an atomic git commit:
+   ```bash
+   git add <code-root> docs/plans/ docs/modules-spec/
+   git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <short task summary>"
+   ```
+   The resulting commit hash is recorded in Section 4 (`Execution Evidence & Verification Log`) of the active Phase Dossier. Because every completed `[x]` task is committed to `HEAD`, any uncommitted diff in `git status` / `git diff HEAD` belongs exclusively to an interrupted in-flight task.
+6. **Cross-Module Integration & Full-Stack E2E Gate (`SYS` Closing Phase):**
+   - The reserved `SYS` (`system`) module acts as a **two-sided bookend**:
+     - **Opening Bookend (`SYS-P01` in `GP-01`):** Scaffolds shared infrastructure, local orchestration (`docker-compose.yml` / dev stack), and codifies shared contracts (`CT-*` → `AVAILABLE`).
+     - **Closing Bookend (`SYS-P<FINAL>` in `GP-<FINAL>`):** Executes ONLY after all domain and UI module phases are archived in `docs/plans/completed/<slug>/`. It boots the live integrated stack (DB + Backend Services + API Gateway + Frontend), verifies live cross-module contract (`CT-*`) round-trips without mocks, and runs end-to-end (E2E) user journeys (using Playwright/Cypress or integration runners) that target the exact **`data-testid="scr-<nn>-..."` anchors** locked in `docs/prototypes/registry.md` from UI interaction → API call → DB state mutation → UI state update.
+7. **The `"Tiếp tục"` (Continue) State Machine:**
    - **Within an Active Phase (`IN_PROGRESS`):** When the user enters `"tiếp tục"` (or `"continue"`, `"tiếp tục <MOD>"`), the Agent checks the `🎫 Resume Ticket`, performs the **3-Step Crash / Dirty-State Reconciliation** (Section 4.2), and executes the **next sequential unchecked `- [ ]` Atomic Task** in the current Phase Dossier.
    - **Completing the Final Atomic Task of a Phase:** In the turn where the last unchecked Atomic Task of `<MOD>-P<NN>` passes verification:
      1. The Agent marks `- [x]` on that final task.
@@ -119,6 +129,7 @@ Gate 3 executes in **four sequential sub-steps** (`Step 3.0` is conditional on w
 | Dynamic Sub-Task (Hotfix) | `<MOD>-P<NN>.<M>.<A>[a-z]` | `AUTH-P01.2.3a` | `docs/plans/active/auth/phase-01-*.md` |
 | Contract | `CT-<PROVIDER>-<NN>` | `CT-AUTH-01` | `docs/plans/contract-registry.md` |
 | UI Screen Prototype | `SCR-<MOD>-<NN>` | `SCR-WEB-01` | `docs/prototypes/registry.md` |
+| Mid-Flight Change Request | `CR-<NN>` | `CR-01` | `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) |
 
 Module codes and slugs are assigned once in the Module Registry and never reused. The pseudo-module `system` / `SYS` is reserved for cross-cutting work.
 
@@ -149,20 +160,23 @@ When resuming work in a fresh session (or across parallel agent tabs / Git Workt
 2. Select the target module's active phase dossier in `docs/plans/active/<module-slug>/` (choosing the dossier with `Lifecycle Status: IN_PROGRESS` or `PHASE_COMPLETED`, or the lowest-numbered `phase-<NN>-*.md` if starting).
 3. Activate the mandatory skills for that module from `ai-skill-maps.md`.
 
-### 4.2 3-Step Crash / Interrupted Task Reconciliation
-If the IDE, terminal, or power was lost **mid-turn** while an Atomic Task was being executed, the `🎫 Resume Ticket` or checkbox `- [ ]` on disk may lag behind actual file modifications. Before writing any code on `"tiếp tục"`, the Agent MUST reconcile:
+### 4.2 Atomic Git Commit Checkpointing & 3-Step Crash Reconciliation
+Because every verified `[x]` Atomic Task is immediately committed to Git (`HEAD`) at the end of its turn, `HEAD` is always a known-good, test-passing checkpoint. If the IDE, terminal, or power was lost **mid-turn** while an Atomic Task was being executed, any uncommitted modification in `git status` / `git diff HEAD` belongs **100% to that single interrupted Atomic Task**.
+
+Before writing any code on `"tiếp tục"`, the Agent MUST reconcile:
 
 1. **Write-Ahead Ticket Update:** At the very start of every Atomic Task turn, before touching any source file, update the `🎫 Resume Ticket` to `Lifecycle Status: IN_PROGRESS` and set `Active Atomic Task` to the task being started.
-2. **Working Tree Inspection (`git status` & `git diff`):** When resuming via `"tiếp tục"`, inspect the first unchecked `- [ ]` Atomic Task's `Target Files` and run `git status --short` / `git diff` scoped to the module's `Code Root`.
+2. **Working Tree & `HEAD` Inspection (`git status --short` & `git diff HEAD`):** When resuming via `"tiếp tục"`, inspect the first unchecked `- [ ]` Atomic Task's `Target Files` and run `git status --short` / `git diff HEAD` scoped to the module's `Code Root`.
 3. **Deterministic Recovery Action:**
-   - **Clean State (No uncommitted edits in Target Files):** The task has not started. Execute the task from scratch.
-   - **Completed-Before-Crash State (Target Files already implemented):** Run the task's `Executable Proof Command`. If all tests and acceptance criteria **PASS**, mark `- [x]` on that task, log the recovery in Section 4 of the dossier, and immediately execute the next sequential Atomic Task in the same turn.
-   - **Partially-Written / Interrupted State (Target Files modified mid-edit or failing tests):** Report the exact state in 3 lines (*Module/Phase/Task, interrupted file & line/failure, and recovery action*), then complete the remaining logic of that exact Atomic Task without duplicating or overwriting valid work.
+   - **Clean State (No uncommitted edits in Target Files relative to `HEAD`):** The task has not started. Execute the task from scratch, then commit at the end of the turn.
+   - **Completed-Before-Crash State (Target Files already implemented before crash):** Run the task's `Executable Proof Command`. If all tests and acceptance criteria **PASS**, mark `- [x]` on that task, create the missing atomic git commit (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> (recovered)"`), log the recovery in Section 4 of the dossier, and immediately execute the next sequential Atomic Task in the same turn.
+   - **Partially-Written / Interrupted State (Target Files modified mid-edit or failing tests):** Report the exact state in 3 lines (*Module/Phase/Task, interrupted file & line/failure relative to `HEAD`, and recovery action*), then complete the remaining logic of that exact Atomic Task without duplicating valid work (or restore a corrupted file from `HEAD` via `git checkout HEAD -- <file>` if needed), verify tests pass, and create the atomic git commit.
 
 ---
 
-## 5. Multi-Agent & Git Worktree Execution
+## 5. Multi-Agent, Git Worktree & Cross-Module E2E Integration
 
+### 5.1 Parallel Module Execution (Mode A & Mode B)
 Once foundational contracts (`SYS` / `GP-01`) are `AVAILABLE`, multiple AI agents can execute different modules in parallel using two supported modes:
 
 1. **Mode A — Parallel Tabs / Subagents in Shared Workspace:**
@@ -170,12 +184,46 @@ Once foundational contracts (`SYS` / `GP-01`) are `AVAILABLE`, multiple AI agent
    - Because each module owns its own `docs/modules-spec/<module-slug>.md` and `docs/plans/active/<module-slug>/` directory, parallel agents never conflict on dossier files.
 2. **Mode B — Isolated Git Worktrees (Recommended for Heavy Parallel Builds):**
    - Each agent creates an isolated worktree (`git worktree add ../<project>-<slug> -b feat/<slug> main`).
-   - All Gate 5 atomic turns, builds, and unit tests run inside the worktree.
-   - Upon completing all phases of `<MOD>`, the agent runs the full module test suite and `python scripts/validate_plans.py --fix`, commits cleanly, merges `feat/<slug>` back into `main`, and removes the worktree.
+   - All Gate 5 atomic turns, builds, unit tests, and per-task atomic git commits run inside the worktree.
+   - Upon completing all phases of `<MOD>`, the agent runs the full module test suite and `python scripts/validate_plans.py --fix`, merges `feat/<slug>` back into `main`, and removes the worktree.
+
+### 5.2 Closing `SYS` Cross-Module Integration & Full-Stack E2E Gate (`GP-<FINAL>`)
+While individual modules (`AUTH`, `ORD`, `WEB`, ...) test their logic in isolation during `GP-02` / `GP-03`, the system is NOT complete until the closing **`SYS` Integration & E2E Phase** (`SYS-P<FINAL>`) passes:
+1. **Entry Pre-Condition:** All domain and frontend module phases listed in earlier Global Phases must be archived in `docs/plans/completed/<module-slug>/`.
+2. **Live Topology Boot:** `SYS-P<FINAL>` boots the full multi-service / modular-monolith topology (real database instances + migrations, Redis/message brokers, backend services, API gateway, and compiled frontend app).
+3. **Live Cross-Module Contract Verification:** Executes real HTTP/gRPC/Event contract integration tests across services (`CT-*`) with zero mocks.
+4. **Full-Stack E2E Browser Verification (Frontend ↔ Backend ↔ DB):** When `UI Required: YES`, executes automated E2E tests (e.g., Playwright) driving the real UI via the locked **`data-testid="scr-<nn>-..."` attributes** from `docs/prototypes/registry.md`, asserting that user actions trigger real backend API calls (`CT-*`), persist in the database, and render the approved UI states (`default`, `loading`, `empty`, `error`).
 
 ---
 
-## 6. Structural Validation & Auto-Synchronization (`scripts/validate_plans.py`)
+## 6. Mid-Flight Change Request & Scope Evolution Protocol (`CR-<NN>`)
+
+When the project is already in Gate 4 or Gate 5 and a new requirement, edge case, or UI change arises, the Agent classifies it into one of two tiers:
+
+| Tier | Trigger Condition | Identifier | Protocol |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: In-Phase Dynamic Sub-Task (Hotfix)** | Local bug, missing validation, or edge case strictly within the current module's scope; **no** change to `CT-*` contracts or `SCR-*` UI screens. | `<MOD>-P<NN>.<M>.<A>[a-z]` (e.g., `AUTH-P01.2.2a`) | Insert the sub-task directly into the current active dossier (`docs/plans/active/<slug>/phase-<NN>-*.md`), document the reason, execute it in 1 turn, verify, and commit. |
+| **Tier 2: Mid-Flight Change Request (Scope Evolution)** | User requests a new feature, new/modified UI screen (`SCR-*`), new/updated cross-module contract (`CT-*`), or a change spanning multiple modules via `"yêu cầu thay đổi: <mô tả>"` (`"change request: <description>"`). | `CR-<NN>` (e.g., `CR-01`) | Execute the **4-Step Delta Reverse-Unlock Protocol** below. **NEVER** uncheck completed `[x]` tasks or edit archived files in `docs/plans/completed/`. |
+
+### The 4-Step Delta Reverse-Unlock Protocol (`CR-<NN>`)
+When the Human Architect enters `"yêu cầu thay đổi: <nội dung>"` (or `"change request: <description>"`):
+1. **Step 1 — Freeze & Register `CR-<NN>` Impact Audit:**
+   - Pause Gate 5 code execution and register a new row `CR-<NN>` in `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) with status `IN_REVIEW`.
+   - Identify the exact **Delta Blast Radius**: which `SPEC.md` sections, `CT-*` contracts, `SCR-*` UI prototypes, `docs/modules-spec/<slug>.md` files, and modules are impacted.
+2. **Step 2 — Delta Gate 2 & Gate 3.0 (Contracts & UI Prototypes First):**
+   - **If UI changes (`SCR-*`):** Create or update ONLY the affected HTML prototype files in `docs/prototypes/<module-slug>/scr-<nn>-*.html` (preserving/adding `data-testid` hooks), log `CR-<NN>` in `docs/prototypes/registry.md`, and **STOP for Human Architect visual approval (`APPROVED`)**.
+   - **If Cross-Module Contracts change (`CT-*`):** Register the new `CT-*` or bump the semantic version of the existing `CT-*` in `docs/plans/contract-registry.md` and log `CR-<NN>` in the Contract Change Log.
+3. **Step 3 — Delta Gate 3.1 & Gate 4 (Append-Only Spec & Dossier Amendment):**
+   - Update `SPEC.md` and the affected `docs/modules-spec/<slug>.md` files to reflect the approved delta.
+   - Update Phase Dossiers **without touching completed history**:
+     - *Case A (Module still has an `IN_PROGRESS` or `PENDING` dossier in `docs/plans/active/<slug>/`):* Append new Major/Atomic Tasks (`<MOD>-P<NN>.<M>.1..3` tagged with `[CR-<NN>]`) to the appropriate active dossier.
+     - *Case B (All previous phases of the module are already in `docs/plans/completed/<slug>/`):* Append a new **Delta Phase (`<MOD>-P<NN+1>`)** to `docs/modules-spec/<slug>.md` (`## 9. Module Phase Sequence`) and generate a new dossier `docs/plans/active/<slug>/phase-<NN+1>-cr-<nn>-<slug>.md`.
+4. **Step 4 — Validate, Commit Delta Plan & Resume Gate 5:**
+   - Mark `CR-<NN>` as `APPROVED` in `docs/plans/system-roadmap.md`, run `python scripts/validate_plans.py --fix`, commit the planning delta (`git commit -m "chore(plan): apply CR-<NN> delta specs and WBS"`), and resume Gate 5 execution via `"tiếp tục"`.
+
+---
+
+## 7. Structural Validation & Auto-Synchronization (`scripts/validate_plans.py`)
 
 Run the cross-platform Python validator after any planning change, phase transition, or archival step:
 

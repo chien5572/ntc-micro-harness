@@ -115,10 +115,10 @@ for rule_file in "${AGENT_FILES[@]}"; do
         cat << 'EOF' > "${DST_RULE}"
 <!-- HARNESS:BEGIN -->
 Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
 - Note: `STEP-by-STEP.md` is strictly for the Human Architect; AI Agents must NOT read it.
-- Implement exactly ONE Atomic Task per turn. Never generate incomplete stubs.
-- Update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix` before concluding any turn.
+- Implement exactly ONE Atomic Task per turn (with 1:1 UI Prototype Parity for `SCR-<MOD>-<NN>` tasks and `CR-<NN>` Delta Change Request handling). Never generate incomplete stubs.
+- Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before concluding any turn.
 <!-- HARNESS:END -->
 EOF
         echo "  [+] Configured agent rule: ${rule_file}"

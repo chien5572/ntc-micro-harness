@@ -47,3 +47,11 @@ STRUCTURE INVARIANTS are checked by scripts/validate_plans.py (see the template 
 | Module | Active Dossier | Lifecycle Status |
 | :--- | :--- | :--- |
 | *[None]* | | |
+
+---
+
+## 6. Change Request (CR) Log
+
+| CR ID | Date | Summary | Impacted Contracts / Screens | Impacted Modules & Phases | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *[None]* | | | | | |

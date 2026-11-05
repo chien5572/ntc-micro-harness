@@ -56,7 +56,7 @@ flowchart LR
 | `GP-01` | Foundation & Contracts | Repo scaffolding, local infra, first contracts codified | `SYS-P01`, `AUTH-P01` | Infra boots; `CT-AUTH-01` `AVAILABLE` | `ACTIVE` |
 | `GP-02` | Core Domain Services | Primary business capabilities per service | `AUTH-P02`, `ORD-P01` | Module test suites green | `PENDING` |
 | `GP-03` | Integration & Async Flows | Events, workers, cross-service flows | `ORD-P02`, `SYS-P02` | Contract tests green across providers/consumers | `PENDING` |
-| `GP-04` | Hardening & Release | E2E, load, security review | `SYS-P03` | E2E + NFR targets met | `PENDING` |
+| `GP-04` | Cross-Module Integration, Full-Stack E2E & Release (`SYS` Closing Gate) | Boot full topology (DB + Backend + Gateway + Frontend), live `CT-*` contract round-trips, and full-stack E2E browser journeys (`SCR-*` `data-testid`) | `SYS-P03` | Live stack E2E + contract + NFR suites 100% green | `PENDING` |
 
 ---
 
@@ -84,3 +84,14 @@ flowchart LR
 | :--- | :--- | :--- |
 | `AUTH` | `docs/plans/active/auth/phase-01-contracts-and-schema.md` | `IN_PROGRESS` |
 | `AUTH` | `docs/plans/active/auth/phase-02-core-domain-logic.md` | `PENDING` |
+
+---
+
+## 6. Change Request (CR) Log
+*(Append-only log for Mid-Flight Scope Evolution during Gate 4/5 via `"yêu cầu thay đổi: ..."` / `CR-<NN>`. Completed dossiers in `docs/plans/completed/` are never modified; delta work is appended to active dossiers or added as a new `<MOD>-P<NN+1>` delta phase.)*
+
+| CR ID | Date | Summary | Impacted Contracts / Screens | Impacted Modules & Phases | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `CR-01` | YYYY-MM-DD | Add export CSV action to Order Dashboard | `CT-ORD-03`, `SCR-WEB-02` | `ORD-P03`, `WEB-P02` | `APPROVED` |
+
+**CR Status values:** `IN_REVIEW` | `APPROVED` | `COMPLETED`

@@ -149,10 +149,10 @@ try {
 
 <!-- HARNESS:BEGIN -->
 Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
 - Note: `STEP-by-STEP.md` is strictly for the Human Architect; AI Agents must NOT read it.
-- Enforce the 5-Stage Gated Lifecycle and Single Atomic Task Turn (1 Turn = 1 Micro-task).
-- Update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix` before yielding.
+- Enforce the 5-Stage Gated Lifecycle, 1:1 UI Prototype Parity (`SCR-<MOD>-<NN>`), `CR-<NN>` Delta Change Requests, and Single Atomic Task Turn (`1 Turn = 1 Task`).
+- Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before yielding.
 <!-- HARNESS:END -->
 "@
         ".cursorrules" = @"
@@ -160,10 +160,10 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 
 <!-- HARNESS:BEGIN -->
 Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
 - Never read `STEP-by-STEP.md` (Human-Only Playbook).
-- Implement exactly ONE Atomic Task per turn. Never generate incomplete stubs (no TODOs).
-- Update the `🎫 Resume Ticket` in the active dossier before concluding any turn.
+- Implement exactly ONE Atomic Task per turn (with 1:1 UI Prototype Parity for `SCR-<MOD>-<NN>` tasks). Never generate incomplete stubs (no TODOs).
+- Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before concluding any turn.
 <!-- HARNESS:END -->
 "@
         ".windsurfrules" = @"
@@ -171,9 +171,9 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 
 <!-- HARNESS:BEGIN -->
 Adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Read `SPEC.md`, `AGENTS.md`, and `ai-skill-maps.md` (do not read `STEP-by-STEP.md`).
-- Maintain single-module boundaries, contract-first invariants, and the `"tiếp tục"` / `"tiếp tục phase ..."` state machine.
-- Update the `🎫 Resume Ticket` and run `python scripts/validate_plans.py --fix` before yielding.
+- Read `SPEC.md`, `AGENTS.md`, `docs/prototypes/registry.md` (if UI), and `ai-skill-maps.md` (do not read `STEP-by-STEP.md`).
+- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity, `CR-<NN>` delta change control, and the `"tiếp tục"` / `"tiếp tục phase ..."` state machine.
+- Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before yielding.
 <!-- HARNESS:END -->
 "@
     }
