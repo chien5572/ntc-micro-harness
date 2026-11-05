@@ -2,7 +2,7 @@
 
 > **UI Required:** YES | NO  
 > **Status:** APPROVED | IN_REVIEW | DRAFT | N/A  
-> **Authority:** Created during **Gate 3 (Step 3.0)** from `SPEC.md` and `docs/plans/system-roadmap.md`; must be **APPROVED** by the Human Architect before authoring Detailed Module Specs (Step 3.1) or Phase Dossiers (Gate 4).  
+> **Authority:** Created during **Step 2 (`/ntc-prototype`)** directly from `PRD.md` and `ARCHITECTURE.md`; must be **APPROVED** by the Human Architect (`/ntc-prototype --approve`) before locking the overall `SPEC.md` (Step 3 `/ntc-spec`), Detailed Module Specs (Step 4 `/ntc-modules`), or Phase Dossiers (Step 5 `/ntc-plan`).  
 > **Last Synchronized:** YYYY-MM-DD  
 
 <!--
@@ -13,14 +13,14 @@ STRUCTURE INVARIANTS (checked by scripts/validate_plans.py):
 - Prototype Path: must point to a self-contained HTML file under docs/prototypes/<module-slug>/scr-<nn>-<slug>.html.
 - Status: DRAFT | APPROVED | DEPRECATED.
   - When Status is APPROVED, the HTML file at Prototype Path MUST exist on disk and MUST include `data-testid="..."` attributes on key interactive/layout elements.
-  - Before any Phase Dossier (Gate 4/5) is created for <MOD>, all active screens for <MOD> must be APPROVED (never DRAFT).
+  - Before any Phase Dossier (Step 5 / Step 6) is created for <MOD>, all active screens for <MOD> must be APPROVED (never DRAFT).
 -->
 
 ---
 
 ## 1. Design System & Visual Tokens
 
-*(Locked visual foundation shared across all prototypes and production UI components. AI Agents in Gate 5 MUST copy these exact tokens/classes and NEVER improvise alternative palettes or typography.)*
+*(Locked visual foundation shared across all prototypes and production UI components. AI Agents in Step 6 `/ntc-run` MUST copy these exact tokens/classes and NEVER improvise alternative palettes or typography.)*
 
 - **Styling Engine / Strategy:** (e.g., Tailwind CSS v3/v4, CSS Variables, Shadcn UI tokens)
 - **Color Palette (Exact Hex / CSS Variables):**
@@ -37,7 +37,7 @@ STRUCTURE INVARIANTS (checked by scripts/validate_plans.py):
   - Spacing & Border Radius: Base unit `4px`, card radius `rounded-xl` (`12px`), control radius `rounded-lg` (`8px`)
 - **Mandatory `data-testid` & State Parity Rule:**
   1. Every HTML prototype in `docs/prototypes/<module-slug>/` MUST include `data-testid="scr-<nn>-<element>"` on its root container, forms, inputs, action buttons, data tables/lists, and state views (`default`, `loading`, `empty`, `error`).
-  2. During Gate 5 implementation, AI Agents MUST preserve the exact DOM hierarchy, CSS/Tailwind classes, and `data-testid` attributes 1:1 when porting to production framework components.
+  2. During Step 6 (`/ntc-run`) implementation, AI Agents MUST preserve the exact DOM hierarchy, CSS/Tailwind classes, and `data-testid` attributes 1:1 when porting to production framework components.
 
 ---
 
@@ -54,7 +54,7 @@ STRUCTURE INVARIANTS (checked by scripts/validate_plans.py):
 
 ## 3. Prototype Sign-Off & Change Log
 
-*(Append-only. Once a screen is `APPROVED`, any layout or flow modification requires updating the HTML prototype first and logging Human Architect approval below before changing production code.)*
+*(Append-only. Once a screen is `APPROVED`, any layout or flow modification requires updating the HTML prototype first via `/ntc-prototype --revise` or `/ntc-cr` and logging Human Architect approval below before changing production code.)*
 
 | Date | Screen ID | Version | Approved By | Summary of Visual / Flow Lock |
 | :--- | :--- | :--- | :--- | :--- |

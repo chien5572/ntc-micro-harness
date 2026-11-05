@@ -377,6 +377,8 @@ class Validator:
             "docs/plans/completed/README.md",
             "docs/prototypes/README.md",
             "docs/prototypes/registry.md",
+            "docs/templates/prd-template.md",
+            "docs/templates/architecture-template.md",
             "docs/templates/spec-template.md",
             "docs/templates/system-roadmap-template.md",
             "docs/templates/contract-registry-template.md",
@@ -1249,7 +1251,7 @@ class Validator:
                                 )
 
         # Report
-        print(f"Harness plan validation (v2.0): {self.root}")
+        print(f"Harness plan validation (v2.1 Plugin Edition): {self.root}")
         print(f"  modules registered: {len(code_to_slug)}; active phase dossiers: {len(active_dossiers)}")
         for fx in self.fixes:
             print(f"FIX   {fx}")

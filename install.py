@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""NTC Micro Harness v2.0 - Automated Project Installer.
+"""NTC Micro Harness v2.1 (Plugin Edition) - Automated Project & Plugin Installer.
 
-Installs the Atomic Engineering Protocol (Microservices Edition v2.0) into any target
-software project. Supports both local execution and zero-clone remote one-liner
-execution right inside your project terminal.
+Installs the 6-Step Atomic Engineering Protocol & `/ntc-*` Plugin Skills into any
+target software project, and optionally installs the global Antigravity plugin at
+`~/.gemini/config/plugins/ntc-micro-harness/`.
 """
 
 from __future__ import annotations
@@ -17,41 +17,53 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-HARNESS_VERSION = "2.0.0"
+HARNESS_VERSION = "2.1.0"
 REPO_GIT_URL = "https://github.com/chien5572/ntc-micro-harness.git"
 REPO_ZIP_URL = "https://github.com/chien5572/ntc-micro-harness/archive/refs/heads/main.zip"
+
+NTC_SKILLS = [
+    "ntc-init",
+    "ntc-prototype",
+    "ntc-spec",
+    "ntc-modules",
+    "ntc-plan",
+    "ntc-run",
+    "ntc-cr",
+    "ntc-status",
+]
 
 AGENT_INTEGRATION_TEMPLATES = {
     "CLAUDE.md": """# Claude Code Instructions
 
 <!-- HARNESS:BEGIN -->
-Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+Always adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Hierarchy of Truth: `PRD.md` & `ARCHITECTURE.md` (Step 1 `/ntc-init`) > `docs/prototypes/registry.md` (Step 2 `/ntc-prototype`) > `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `ai-skill-maps.md` (Step 3 `/ntc-spec`) > `docs/modules-spec/<slug>.md` (Step 4 `/ntc-modules`) > `docs/plans/active/<slug>/phase-*.md` (Step 5 `/ntc-plan`).
 - Note: `STEP-by-STEP.md` is strictly for the Human Architect; AI Agents must NOT read it.
-- Enforce the 5-Stage Gated Lifecycle: UI Prototypes (`docs/prototypes/<slug>/scr-*.html`, if UI Required) are approved in Gate 3.0 before all `docs/modules-spec/*.md` (3.1), `ai-skill-maps.md` (3.2), and `STEP-by-STEP.md` (3.3) are created; all Phase Dossiers across all modules are pre-generated in Gate 4 before any Gate 5 code is written.
-- In Gate 5: 1 Turn = 1 Atomic Task. For UI tasks referencing `SCR-<MOD>-<NN>`, read the approved HTML prototype and port its DOM, classes, states, and `data-testid` anchors 1:1. Perform 3-Step Crash Recovery against `HEAD` on `"tiếp tục"`. Stop at the end of a phase and require `"tiếp tục phase <MOD>-P<NN+1>"` to archive and transition.
-- After every verified Atomic Task, update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <summary>"`).
-- For mid-flight feature/screen changes during Gate 4/5 (`"yêu cầu thay đổi: ..."`), execute the 4-Step Delta Reverse-Unlock Protocol (`CR-<NN>`) without rewriting completed dossiers.
+- Step 1 (`/ntc-init`): Always ask for the Project Git Repository URL (optional — can be left blank) first to initialize `git init` and connect `git remote add origin <repo-url>` before asking clarifying Q&A and generating `PRD.md` + `ARCHITECTURE.md`.
+- Step 2 (`/ntc-prototype`): Build interactive HTML/CSS prototypes (`docs/prototypes/<slug>/scr-*.html` with `data-testid` anchors) from `PRD.md` + `ARCHITECTURE.md` and wait for `--approve` (`APPROVED`).
+- Step 3 (`/ntc-spec`): Lock overall `SPEC.md` + `system-roadmap.md` + `contract-registry.md`, then map and install AI skills per module into `.agents/skills/` and `ai-skill-maps.md`.
+- Step 4 (`/ntc-modules`): Read `ai-skill-maps.md` + `SPEC.md` + approved prototypes to author `docs/modules-spec/<slug>.md` for all modules, then generate `STEP-by-STEP.md`.
+- Step 5 (`/ntc-plan`): Pre-generate all Phase Dossiers across all modules before any production code is written.
+- Step 6 (`/ntc-run` / `"tiếp tục"`): 1 Turn = 1 Atomic Task. Enforce 1:1 UI Prototype Parity (`SCR-<MOD>-<NN>`), update `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint (`HEAD`). Handle mid-flight changes via `/ntc-cr` (`CR-<NN>`).
 <!-- HARNESS:END -->
 """,
     ".cursorrules": """# Cursor Agent Rules
 
 <!-- HARNESS:BEGIN -->
-Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+Always adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Slash Commands: `/ntc-init` (Step 1: Git remote + Q&A -> `PRD.md` & `ARCHITECTURE.md`) -> `/ntc-prototype` (Step 2: HTML UI Prototypes `SCR-<MOD>-<NN>`) -> `/ntc-spec` (Step 3: Overall `SPEC.md` + `ai-skill-maps.md`) -> `/ntc-modules` (Step 4: `docs/modules-spec/<slug>.md` + `STEP-by-STEP.md`) -> `/ntc-plan` (Step 5: All Phase Dossiers WBS) -> `/ntc-run` (Step 6: `1 Turn = 1 Atomic Task`).
 - Never read `STEP-by-STEP.md` (Human-Only Playbook).
-- Never write production code before Gate 5 (if UI Required, HTML prototypes in `docs/prototypes/` must be `APPROVED` in Gate 3.0; all `docs/modules-spec/*.md` and all `docs/plans/active/<slug>/phase-*.md` must exist first).
 - Implement exactly ONE Atomic Task per turn (`1 Turn = 1 Task`). For UI tasks, port the approved `SCR-<MOD>-<NN>` HTML prototype 1:1 (including `data-testid` hooks). Never output incomplete stubs.
 - Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before concluding any turn.
-- On `"yêu cầu thay đổi: ..."`, follow the `CR-<NN>` 4-Step Delta Reverse-Unlock Protocol.
+- On `/ntc-cr` or `"yêu cầu thay đổi: ..."`, follow the `CR-<NN>` 4-Step Delta Reverse-Unlock Protocol.
 <!-- HARNESS:END -->
 """,
     ".windsurfrules": """# Windsurf Cascade Rules
 
 <!-- HARNESS:BEGIN -->
-Adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Read `SPEC.md`, `AGENTS.md`, `docs/prototypes/registry.md` (if UI), and `ai-skill-maps.md` (do not read `STEP-by-STEP.md`).
-- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity (`SCR-<MOD>-<NN>`), `CR-<NN>` delta change control, and the `"tiếp tục"` / `"tiếp tục phase ..."` state machine.
+Adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Follow `/ntc-init` -> `/ntc-prototype` -> `/ntc-spec` -> `/ntc-modules` -> `/ntc-plan` -> `/ntc-run` (do not read `STEP-by-STEP.md`).
+- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity (`SCR-<MOD>-<NN>`), `/ntc-cr` (`CR-<NN>`) delta change control, and the `/ntc-run` / `"tiếp tục"` state machine.
 - Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before yielding.
 <!-- HARNESS:END -->
 """,
@@ -82,18 +94,69 @@ def fetch_remote_harness(temp_dir: Path) -> Path:
         return extracted_dirs[0]
 
 
+def configure_git_repo(target_root: Path, repo_url: str | None) -> None:
+    """Initializes git in target_root and optionally connects remote origin."""
+    git_dir = target_root / ".git"
+    if not git_dir.exists():
+        subprocess.run(["git", "init"], cwd=str(target_root), check=False, stdout=subprocess.DEVNULL)
+        print(f"  [+] Initialized empty Git repository in {target_root}")
+
+    if repo_url and repo_url.strip():
+        clean_url = repo_url.strip()
+        res = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            cwd=str(target_root),
+            capture_output=True,
+            text=True,
+        )
+        if res.returncode == 0:
+            subprocess.run(["git", "remote", "set-url", "origin", clean_url], cwd=str(target_root), check=False)
+            print(f"  [+] Updated Git remote 'origin' -> {clean_url}")
+        else:
+            subprocess.run(["git", "remote", "add", "origin", clean_url], cwd=str(target_root), check=False)
+            print(f"  [+] Connected Git remote 'origin' -> {clean_url}")
+
+
+def install_global_plugin(source_root: Path, plugin_dir: Path | None = None) -> Path:
+    """Installs NTC Micro-Harness as a global Antigravity plugin (~/.gemini/config/plugins/ntc-micro-harness)."""
+    dst_plugin = plugin_dir or (Path.home() / ".gemini" / "config" / "plugins" / "ntc-micro-harness")
+    dst_plugin.mkdir(parents=True, exist_ok=True)
+
+    for item in ["plugin.json", ".claude-plugin/plugin.json", "assets/logo.svg", "rules/AGENTS.md"]:
+        s_file = source_root / item
+        d_file = dst_plugin / item
+        if s_file.exists():
+            d_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(s_file, d_file)
+
+    for skill_name in NTC_SKILLS:
+        s_skill = source_root / "skills" / skill_name / "SKILL.md"
+        d_skill = dst_plugin / "skills" / skill_name / "SKILL.md"
+        if s_skill.exists():
+            d_skill.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(s_skill, d_skill)
+
+    print(f"  [+] Installed global plugin bundle at: {dst_plugin}")
+    return dst_plugin
+
+
 def install_harness(
     source_root: Path,
     target_root: Path,
     agent_rules: list[str] | None = None,
     force: bool = False,
+    repo_url: str | None = None,
+    install_plugin: bool = False,
 ) -> None:
-    """Installs the NTC Micro Harness files into the target project root."""
+    """Installs the NTC Micro Harness files and /ntc-* skills into the target project root."""
     target_root = target_root.resolve()
     print(f"[*] Installing NTC Micro Harness v{HARNESS_VERSION} into: {target_root}")
 
     if not target_root.exists():
         target_root.mkdir(parents=True, exist_ok=True)
+
+    if repo_url is not None:
+        configure_git_repo(target_root, repo_url)
 
     # 1. Install or merge AGENTS.md
     src_agents = source_root / "AGENTS.md"
@@ -128,6 +191,8 @@ def install_harness(
         "plans/system-roadmap.md",
         "plans/active/README.md",
         "plans/completed/README.md",
+        "templates/prd-template.md",
+        "templates/architecture-template.md",
         "templates/application-runbook.md",
         "templates/contract-registry-template.md",
         "templates/ui-prototype-registry-template.md",
@@ -168,7 +233,21 @@ def install_harness(
         else:
             print(f"  [.] {dst_script.relative_to(target_root)} already exists (skipping)")
 
-    # 4. Configure agent integration rules
+    # 4. Install /ntc-* slash command skills into workspace (.agents/skills/)
+    for skill_name in NTC_SKILLS:
+        s_skill = source_root / "skills" / skill_name / "SKILL.md"
+        d_skill = target_root / ".agents" / "skills" / skill_name / "SKILL.md"
+        if s_skill.exists():
+            if not d_skill.exists() or force:
+                d_skill.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(s_skill, d_skill)
+                print(f"  [+] Installed slash skill /{skill_name} -> {d_skill.relative_to(target_root)}")
+
+    # 5. Optional global plugin installation (~/.gemini/config/plugins/ntc-micro-harness)
+    if install_plugin:
+        install_global_plugin(source_root)
+
+    # 6. Configure agent integration rules
     if agent_rules:
         for rule_file, rule_content in AGENT_INTEGRATION_TEMPLATES.items():
             if (
@@ -186,20 +265,23 @@ def install_harness(
                         dst_rule.write_text(existing.rstrip() + "\n\n" + rule_content, encoding="utf-8")
                         print(f"  [+] Appended harness rule to: {rule_file}")
 
-    print("\n" + "=" * 65)
-    print(f"SUCCESS: NTC Micro Harness v{HARNESS_VERSION} successfully installed!")
-    print("=" * 65)
-    print("Next Steps:")
-    print("  1. Draft your system requirements at `SPEC.md` using `docs/templates/spec-template.md`.")
-    print("  2. Start your AI Agent (Antigravity, Claude Code, Cursor, Windsurf) and prompt:")
-    print('     "Read SPEC.md and AGENTS.md to perform Gate 1 & Gate 2."')
-    print("  3. Validate and auto-sync planning documents at any time using:")
-    print("     python scripts/validate_plans.py --fix\n")
+    print("\n" + "=" * 68)
+    print(f"SUCCESS: NTC Micro Harness v{HARNESS_VERSION} (Plugin Edition) installed!")
+    print("=" * 68)
+    print("6-Step /ntc-* Slash Command Workflow:")
+    print("  1. /ntc-init       -> Connect Git remote repo (optional) + Q&A -> PRD.md & ARCHITECTURE.md")
+    print("  2. /ntc-prototype  -> Build & refine interactive HTML UI Prototypes (SCR-<MOD>-<NN>)")
+    print("  3. /ntc-spec       -> Lock overall SPEC.md + Roadmap + Contracts + ai-skill-maps.md")
+    print("  4. /ntc-modules    -> Author detailed docs/modules-spec/<slug>.md + STEP-by-STEP.md")
+    print("  5. /ntc-plan       -> Pre-generate all Phase Dossiers & Level-4 Atomic WBS")
+    print("  6. /ntc-run        -> Execute 1 Atomic Task per turn + 1:1 UI Parity + Auto Git Commit")
+    print("  *  /ntc-cr         -> 4-Step Delta Reverse-Unlock for mid-flight Change Requests (CR-<NN>)")
+    print("  *  /ntc-status     -> Validate plans (--fix) or run Closing SYS Full-Stack E2E (--e2e)\n")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Install NTC Micro Harness v2.0 into any software repository.",
+        description="Install NTC Micro Harness v2.1 (Plugin Edition) into any software repository.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -208,6 +290,19 @@ def main() -> None:
         type=Path,
         default=Path("."),
         help="Target project directory path (defaults to current working directory)",
+    )
+    parser.add_argument(
+        "--repo",
+        "-r",
+        type=str,
+        default=None,
+        help="Optional Git remote repository URL to connect (origin) before starting work",
+    )
+    parser.add_argument(
+        "--plugin",
+        "-p",
+        action="store_true",
+        help="Also install NTC Micro-Harness as a global plugin (~/.gemini/config/plugins/ntc-micro-harness)",
     )
     parser.add_argument(
         "--agent",
@@ -234,6 +329,8 @@ def main() -> None:
             target_root=args.target,
             agent_rules=agent_selection,
             force=args.force,
+            repo_url=args.repo,
+            install_plugin=args.plugin,
         )
     else:
         with tempfile.TemporaryDirectory(prefix="ntc-harness-") as tmp:
@@ -243,6 +340,8 @@ def main() -> None:
                 target_root=args.target,
                 agent_rules=agent_selection,
                 force=args.force,
+                repo_url=args.repo,
+                install_plugin=args.plugin,
             )
 
 

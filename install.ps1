@@ -1,11 +1,15 @@
 <#
 .SYNOPSIS
-    Automated installation script for NTC Micro Harness v2.0 (Windows PowerShell / PowerShell Core).
+    Automated installation script for NTC Micro Harness v2.1 Plugin Edition (Windows PowerShell / PowerShell Core).
 .DESCRIPTION
-    Installs the Atomic Engineering Protocol (Microservices Edition v2.0) into the current or specified project.
-    Supports both local execution and remote 1-liner execution (`irm ... | iex`).
+    Installs the 6-Step Atomic Engineering Protocol & `/ntc-*` Plugin Skills into the current or specified project,
+    and optionally installs the global Antigravity plugin at `~/.gemini/config/plugins/ntc-micro-harness`.
 .PARAMETER TargetPath
     Path to the target project directory. Defaults to current directory (`.`).
+.PARAMETER RepoUrl
+    Optional Git remote repository URL to connect (`origin`) right up front.
+.PARAMETER InstallPlugin
+    Also install NTC Micro-Harness as a global plugin (`~/.gemini/config/plugins/ntc-micro-harness`).
 .PARAMETER AgentRules
     Configure agent rule files: 'all', 'claude', 'cursor', 'windsurf', 'none'. Default is 'all'.
 .PARAMETER Force
@@ -15,6 +19,12 @@
 param(
     [Parameter(Position = 0)]
     [string]$TargetPath = ".",
+
+    [Parameter()]
+    [string]$RepoUrl = "",
+
+    [Parameter()]
+    [switch]$InstallPlugin,
 
     [Parameter()]
     [string[]]$AgentRules = @("all"),
@@ -34,7 +44,7 @@ try {
     if ([string]::IsNullOrWhiteSpace($sourceRoot) -or -not (Test-Path (Join-Path $sourceRoot "AGENTS.md")) -or -not (Test-Path (Join-Path $sourceRoot "docs\WORKFLOW.md"))) {
         $tempExtractDir = Join-Path ([System.IO.Path]::GetTempPath()) ("ntc-harness-" + [Guid]::NewGuid().ToString("N"))
         New-Item -ItemType Directory -Path $tempExtractDir -Force | Out-Null
-        Write-Host "[*] Fetching NTC Micro Harness v2.0 from $RepoGitUrl ..." -ForegroundColor Cyan
+        Write-Host "[*] Fetching NTC Micro Harness v2.1 from $RepoGitUrl ..." -ForegroundColor Cyan
 
         $gitCmd = Get-Command git -ErrorAction SilentlyContinue
         if ($gitCmd) {
@@ -61,8 +71,27 @@ try {
     $targetPath = $resolvedTarget.Path
 
     Write-Host "==========================================================" -ForegroundColor Cyan
-    Write-Host " Installing NTC Micro Harness v2.0 into: $targetPath" -ForegroundColor Cyan
+    Write-Host " Installing NTC Micro Harness v2.1 into: $targetPath" -ForegroundColor Cyan
     Write-Host "==========================================================" -ForegroundColor Cyan
+
+    # 0. Optional Git Repo Connection
+    if (-not [string]::IsNullOrWhiteSpace($RepoUrl)) {
+        if (-not (Test-Path (Join-Path $targetPath ".git"))) {
+            Push-Location $targetPath
+            git init | Out-Null
+            Pop-Location
+            Write-Host "  [+] Initialized Git repository in $targetPath" -ForegroundColor Green
+        }
+        Push-Location $targetPath
+        $hasOrigin = git remote | Where-Object { $_ -eq "origin" }
+        if ($hasOrigin) {
+            git remote set-url origin $RepoUrl
+        } else {
+            git remote add origin $RepoUrl
+        }
+        Pop-Location
+        Write-Host "  [+] Connected Git remote 'origin' -> $RepoUrl" -ForegroundColor Green
+    }
 
     # 1. Install or update AGENTS.md
     $srcAgents = Join-Path $sourceRoot "AGENTS.md"
@@ -98,6 +127,8 @@ try {
         "plans\system-roadmap.md",
         "plans\active\README.md",
         "plans\completed\README.md",
+        "templates\prd-template.md",
+        "templates\architecture-template.md",
         "templates\application-runbook.md",
         "templates\contract-registry-template.md",
         "templates\ui-prototype-registry-template.md",
@@ -142,16 +173,56 @@ try {
         }
     }
 
-    # 4. Agent rule integrations
+    # 4. Copy /ntc-* Slash Command Skills into workspace (.agents/skills/)
+    $ntcSkills = @("ntc-init", "ntc-prototype", "ntc-spec", "ntc-modules", "ntc-plan", "ntc-run", "ntc-cr", "ntc-status")
+    foreach ($skill in $ntcSkills) {
+        $srcSkill = Join-Path $sourceRoot "skills\$skill\SKILL.md"
+        $dstSkill = Join-Path $targetPath ".agents\skills\$skill\SKILL.md"
+        if (Test-Path $srcSkill) {
+            $dstSkillDir = Split-Path -Path $dstSkill -Parent
+            if (-not (Test-Path $dstSkillDir)) {
+                New-Item -ItemType Directory -Path $dstSkillDir -Force | Out-Null
+            }
+            if (-not (Test-Path $dstSkill) -or $Force) {
+                Copy-Item -Path $srcSkill -Destination $dstSkill -Force
+                Write-Host "  [+] Installed slash skill /$skill -> .agents\skills\$skill\SKILL.md" -ForegroundColor Green
+            }
+        }
+    }
+
+    # 5. Optional Global Plugin Installation (~/.gemini/config/plugins/ntc-micro-harness)
+    if ($InstallPlugin) {
+        $globalPluginDir = Join-Path $HOME ".gemini\config\plugins\ntc-micro-harness"
+        New-Item -ItemType Directory -Path $globalPluginDir -Force | Out-Null
+        foreach ($pFile in @("plugin.json", ".claude-plugin\plugin.json", "assets\logo.svg", "rules\AGENTS.md")) {
+            $sP = Join-Path $sourceRoot $pFile
+            $dP = Join-Path $globalPluginDir $pFile
+            if (Test-Path $sP) {
+                New-Item -ItemType Directory -Path (Split-Path $dP -Parent) -Force | Out-Null
+                Copy-Item -Path $sP -Destination $dP -Force
+            }
+        }
+        foreach ($skill in $ntcSkills) {
+            $sS = Join-Path $sourceRoot "skills\$skill\SKILL.md"
+            $dS = Join-Path $globalPluginDir "skills\$skill\SKILL.md"
+            if (Test-Path $sS) {
+                New-Item -ItemType Directory -Path (Split-Path $dS -Parent) -Force | Out-Null
+                Copy-Item -Path $sS -Destination $dS -Force
+            }
+        }
+        Write-Host "  [+] Installed global plugin at: $globalPluginDir" -ForegroundColor Green
+    }
+
+    # 6. Agent rule integrations
     $agentTemplates = @{
         "CLAUDE.md" = @"
 # Claude Code Instructions
 
 <!-- HARNESS:BEGIN -->
-Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+Always adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Slash Commands: `/ntc-init` (Step 1: Git remote + Q&A -> `PRD.md` & `ARCHITECTURE.md`) -> `/ntc-prototype` (Step 2: HTML UI Prototypes `SCR-<MOD>-<NN>`) -> `/ntc-spec` (Step 3: Overall `SPEC.md` + `ai-skill-maps.md`) -> `/ntc-modules` (Step 4: `docs/modules-spec/<slug>.md` + `STEP-by-STEP.md`) -> `/ntc-plan` (Step 5: All Phase Dossiers WBS) -> `/ntc-run` (Step 6: `1 Turn = 1 Atomic Task`).
 - Note: `STEP-by-STEP.md` is strictly for the Human Architect; AI Agents must NOT read it.
-- Enforce the 5-Stage Gated Lifecycle, 1:1 UI Prototype Parity (`SCR-<MOD>-<NN>`), `CR-<NN>` Delta Change Requests, and Single Atomic Task Turn (`1 Turn = 1 Task`).
+- Enforce 1:1 UI Prototype Parity (`SCR-<MOD>-<NN>`), `/ntc-cr` (`CR-<NN>`) Delta Change Requests, and Single Atomic Task Turn (`1 Turn = 1 Task`).
 - Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before yielding.
 <!-- HARNESS:END -->
 "@
@@ -159,8 +230,8 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 # Cursor Agent Rules
 
 <!-- HARNESS:BEGIN -->
-Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+Always adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Slash Commands: `/ntc-init` -> `/ntc-prototype` -> `/ntc-spec` -> `/ntc-modules` -> `/ntc-plan` -> `/ntc-run` -> `/ntc-cr` -> `/ntc-status`.
 - Never read `STEP-by-STEP.md` (Human-Only Playbook).
 - Implement exactly ONE Atomic Task per turn (with 1:1 UI Prototype Parity for `SCR-<MOD>-<NN>` tasks). Never generate incomplete stubs (no TODOs).
 - Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before concluding any turn.
@@ -170,9 +241,9 @@ Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md`
 # Windsurf Cascade Rules
 
 <!-- HARNESS:BEGIN -->
-Adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Read `SPEC.md`, `AGENTS.md`, `docs/prototypes/registry.md` (if UI), and `ai-skill-maps.md` (do not read `STEP-by-STEP.md`).
-- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity, `CR-<NN>` delta change control, and the `"tiếp tục"` / `"tiếp tục phase ..."` state machine.
+Adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Follow `/ntc-init` -> `/ntc-prototype` -> `/ntc-spec` -> `/ntc-modules` -> `/ntc-plan` -> `/ntc-run` (do not read `STEP-by-STEP.md`).
+- Maintain single-module boundaries, contract-first invariants, 1:1 UI prototype parity, `/ntc-cr` delta change control, and the `/ntc-run` / `"tiếp tục"` state machine.
 - Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before yielding.
 <!-- HARNESS:END -->
 "@
@@ -199,14 +270,15 @@ Adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `d
     }
 
     Write-Host "`n==========================================================" -ForegroundColor Cyan
-    Write-Host " SUCCESS: NTC Micro Harness v2.0 installed successfully!" -ForegroundColor Cyan
+    Write-Host " SUCCESS: NTC Micro Harness v2.1 (Plugin Edition) installed!" -ForegroundColor Cyan
     Write-Host "==========================================================" -ForegroundColor Cyan
-    Write-Host "Next Steps:" -ForegroundColor White
-    Write-Host "  1. Draft your project requirements in SPEC.md using docs/templates/spec-template.md."
-    Write-Host "  2. Start your AI Agent (Antigravity, Claude Code, Cursor, Windsurf) and prompt:"
-    Write-Host "     'Read SPEC.md and AGENTS.md to perform Gate 1 & Gate 2.'" -ForegroundColor Yellow
-    Write-Host "  3. Validate and auto-sync planning documents at any time using:"
-    Write-Host "     python scripts/validate_plans.py --fix`n"
+    Write-Host "Start your project with the 6-Step /ntc-* Slash Commands:" -ForegroundColor White
+    Write-Host "  1. /ntc-init       -> Connect Git repo (optional) + Q&A -> PRD.md & ARCHITECTURE.md" -ForegroundColor Yellow
+    Write-Host "  2. /ntc-prototype  -> Build & approve interactive HTML UI Prototypes (SCR-<MOD>-<NN>)"
+    Write-Host "  3. /ntc-spec       -> Lock overall SPEC.md + Roadmap + Contracts + ai-skill-maps.md"
+    Write-Host "  4. /ntc-modules    -> Author detailed docs/modules-spec/<slug>.md + STEP-by-STEP.md"
+    Write-Host "  5. /ntc-plan       -> Pre-generate all Phase Dossiers & Level-4 Atomic WBS"
+    Write-Host "  6. /ntc-run        -> Execute 1 Atomic Task per turn + 1:1 UI Parity + Auto Git Commit`n"
 } finally {
     if ($tempExtractDir -and (Test-Path $tempExtractDir)) {
         Remove-Item -Path $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue

@@ -1,4 +1,4 @@
-# NTC Micro Harness: Giao Thức Kỹ Thuật Nguyên Tử (Phiên Bản Microservices v2.0)
+# NTC Micro-Harness: Giao Thức Kỹ Thuật Nguyên Tử & Plugin `/ntc-*` (v2.1)
 
 <p align="center">
   <strong>🌐 Ngôn ngữ / Language:</strong>
@@ -8,547 +8,287 @@
 
 [![CI Validation](https://github.com/chien5572/ntc-micro-harness/actions/workflows/validate.yml/badge.svg)](https://github.com/chien5572/ntc-micro-harness/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Protocol Version](https://img.shields.io/badge/Harness-v2.0.0-green.svg)](AGENTS.md)
+[![Protocol Version](https://img.shields.io/badge/NTC%20Plugin-v2.1.0-green.svg)](plugin.json)
 [![Compatible with](https://img.shields.io/badge/AI%20Agents-Antigravity%20%7C%20Claude%20Code%20%7C%20Cursor%20%7C%20Windsurf-orange.svg)](AGENTS.md)
 
-**NTC Micro Harness v2.0** là bộ khung kỷ luật kỹ thuật (Engineering Harness) chống trượt ngữ cảnh (zero-drift), tối ưu hóa token, được thiết kế chuyên biệt để lập trình cặp (pair-programming) và điều phối đa tác tử (multi-agent orchestration) với các AI Coding Agent hiện đại (**Google Antigravity**, **Anthropic Claude Code**, **Cursor**, **Windsurf**, và **Roo Code / Cline**).
+**NTC Micro-Harness v2.1 (Plugin Edition)** là bộ khung kỷ luật kỹ thuật (Engineering Harness) kiêm **Plugin Slash Commands (`/ntc-*`)** chống trượt ngữ cảnh (zero-drift), tối ưu hóa token, được thiết kế chuyên biệt để lập trình cặp (pair-programming) và điều phối đa tác tử (multi-agent orchestration) với các AI Coding Agent hiện đại (**Google Antigravity**, **Anthropic Claude Code**, **Cursor**, **Windsurf**, và **Roo Code / Cline**).
 
-Thay vì để AI tự ý nhảy vào viết code chắp vá hoặc tự chế giao diện lệch với ý đồ của bạn, **NTC Micro Harness v2.0** ép AI hoạt động như một **Kiến trúc sư Phần mềm Chính (Principal Software Architect)** thông qua quy trình **5 Cổng Kiểm Soát (5-Stage Gated Lifecycle)**:
-1. **Chốt Giao diện bằng Prototype trước khi Spec & Code (nếu có UI):** Tạo các file HTML/CSS tương tác (`docs/prototypes/<slug>/scr-<nn>-*.html`) có đủ trạng thái và neo `data-testid` ngay tại **Gate 3.0** để bạn duyệt trực tiếp trên trình duyệt trước khi viết Spec và Code.
-2. **Hoàn thiện Đặc tả Chi tiết & Bản đồ Kỹ năng AI:** Viết đặc tả chi tiết cho toàn bộ các module (`docs/modules-spec/`), tương tác tìm kiếm và cài đặt bộ kỹ năng AI (`ai-skill-maps.md`), đồng thời sinh sổ tay câu lệnh cho người dùng (`STEP-by-STEP.md`).
-3. **Bóc tách WBS Toàn Dự Án Trước Khi Code:** Sinh sẵn toàn bộ hồ sơ pha (Phase Dossiers) và Atomic Tasks cho mọi module (`docs/plans/active/`) tại Gate 4.
-4. **Thực thi Nguyên tử & Bảo toàn 1:1 Giao diện tại Gate 5:** Thực thi đúng **1 Lượt = 1 Atomic Task** kèm chuyển đổi 1:1 từ UI Prototype đã chốt, kiểm thử thực tế, **Khôi phục sự cố 3 bước (3-Step Crash Recovery)**, và chốt chặn chuyển phase an toàn bằng lệnh **`"tiếp tục"` / `"tiếp tục phase <MOD>-P<NN+1>"`**.
+Thay vì bắt bạn phải tự tay viết hàng chục trang tài liệu từ đầu hoặc để AI tự ý nhảy vào viết code chắp vá, **NTC Micro-Harness v2.1** dẫn dắt toàn bộ vòng đời dự án qua **6 Bước điều khiển bằng lệnh `/ntc-*` trực quan**:
+1. **Bước 1 (`/ntc-init`) — Kết nối Git Repo & Hỏi-Đáp tạo `PRD.md` + `ARCHITECTURE.md`:** Ngay khi khởi chạy, Agent hỏi link **Git Repo của dự án** (để kết nối `git remote origin` trước khi làm bất cứ việc gì — có thể để trống nếu làm local) và **ý tưởng cơ bản**. Sau đó Agent đặt 3–5 câu hỏi làm rõ để cùng bạn hoàn thiện và tự động sinh ra [`PRD.md`](docs/templates/prd-template.md) & [`ARCHITECTURE.md`](docs/templates/architecture-template.md).
+2. **Bước 2 (`/ntc-prototype`) — Tạo & Chốt UI Prototype từ `PRD` + `ARCHITECTURE` (nếu có UI):** Tạo các file HTML/CSS tương tác (`docs/prototypes/<slug>/scr-<nn>-*.html`) có đủ 4 trạng thái (`default`, `loading`, `empty`, `error`) và neo `data-testid`, chỉnh sửa (`--revise`) cho đến khi bạn hài lòng và chốt (`--approve` → `APPROVED`).
+3. **Bước 3 (`/ntc-spec`) — Chốt `SPEC.md` Tổng Quan & Gán AI Skills (`ai-skill-maps.md`):** Tổng hợp thành [`SPEC.md`](docs/templates/spec-template.md) tổng quan (kèm `system-roadmap.md` và `contract-registry.md`) để bạn duyệt. Ngay sau đó, dựa trên `SPEC.md`, Agent đề xuất và cài đặt các **AI Skills** tương ứng cho từng chức năng (module/service) vào `.agents/skills/` và lập file hướng dẫn sử dụng skills [`ai-skill-maps.md`](docs/templates/ai-skill-maps-template.md).
+4. **Bước 4 (`/ntc-modules`) — Tạo SPEC Chi Tiết Từng Module & `STEP-by-STEP.md`:** Dựa theo `SPEC.md` tổng quan, các **Skills** trong `ai-skill-maps.md` và `UI Prototypes` đã chốt, Agent viết bản đặc tả chi tiết [`docs/modules-spec/<slug>.md`](docs/templates/module-spec-template.md) cho từng chức năng (module/service). Khi bạn duyệt (`--approve`), hệ thống tự động sinh sổ tay [`STEP-by-STEP.md`](docs/templates/step-by-step-template.md).
+5. **Bước 5 (`/ntc-plan`) — Chia nhỏ WBS Cấp 4 Toàn Dự Án (Gate 4):** Sinh sẵn 100% Hồ sơ Pha (`docs/plans/active/<slug>/phase-<NN>-*.md`) với các Atomic Tasks cấp 4 cho mọi module trước khi viết bất kỳ dòng code nào.
+6. **Bước 6 (`/ntc-run` / `"tiếp tục"`) — Thực thi Nguyên tử, Auto Git Commit, `/ntc-cr` & Khóa Đuôi `SYS` E2E (Gate 5):** Thực thi đúng **1 Lượt = 1 Atomic Task**, ép khớp **1:1 UI Prototype (`data-testid`)**, chạy test thực tế, **tự động `git commit` tạo điểm lui (rollback point) sau mỗi task**, hỗ trợ yêu cầu thay đổi giữa chừng qua **`/ntc-cr`** (`CR-<NN>`), và khóa đuôi bằng kiểm thử tích hợp Full-Stack E2E (**`/ntc-status --e2e`**).
 
 ---
 
 ## Mục Lục
 
-1. [Giới thiệu & Tại sao cần NTC Micro Harness v2.0?](#1-giới-thiệu--tại-sao-cần-ntc-micro-harness-v20)
-2. [Kiến trúc Cốt lõi & Hệ thống Phân cấp Sự thật (Hierarchy of Truth)](#2-kiến-trúc-cốt-lõi--hệ-thống-phân-cấp-sự-thật-hierarchy-of-truth)
-3. [Hướng dẫn Cài đặt 1 Lệnh Duy Nhất (Tất cả Môi trường)](#3-hướng-dẫn-cài-đặt-1-lệnh-duy-nhất-tất-cả-môi-trường)
-   - [3.1 Windows PowerShell / PowerShell Core](#31-windows-powershell--powershell-core)
-   - [3.2 Windows Command Prompt (CMD)](#32-windows-command-prompt-cmd)
-   - [3.3 Linux / macOS / WSL / Git Bash](#33-linux--macos--wsl--git-bash)
-   - [3.4 Lệnh Python Đa Nền Tảng (Mọi Hệ Điều Hành)](#34-lệnh-python-đa-nền-tảng-mọi-hệ-điều-hành)
-   - [3.5 Tùy chọn Nâng cao & Các File Được Cài Đặt](#35-tùy-chọn-nâng-cao--các-file-được-cài-đặt)
-4. [Quy trình Thực thi Từng Bước (Gate 1 → Gate 5)](#4-quy-trình-thực-thi-từng-bước-gate-1--gate-5)
-   - [Bước 0: Khởi tạo `SPEC.md`](#bước-0-khởi-tạo-specmd)
-   - [Gate 1: Tiếp nhận Đặc tả Gốc & Kiểm toán Kiến trúc](#gate-1-tiếp-nhận-đặc-tả-gốc--kiểm-toán-kiến-trúc)
-   - [Gate 2: Lộ trình Hệ thống (`system-roadmap.md`) & Sổ đăng ký Hợp đồng (`contract-registry.md`)](#gate-2-lộ-trình-hệ-thống-system-roadmapmd--sổ-đăng-ký-hợp-đồng-contract-registrymd)
-   - [Gate 3: UI Prototype (`3.0`), Đặc tả Module (`3.1`), `ai-skill-maps.md` (`3.2`), và `STEP-by-STEP.md` (`3.3`)](#gate-3-ui-prototype-30-đặc-tả-module-31-ai-skill-mapsmd-32-và-step-by-stepmd-33)
-   - [Gate 4: Sinh trước Toàn bộ Hồ sơ Pha & WBS Nguyên tử cho Mọi Module](#gate-4-sinh-trước-toàn-bộ-hồ-sơ-pha--wbs-nguyên-tử-cho-mọi-module)
-   - [Gate 5: Thực thi Nguyên tử, Bảo toàn 1:1 UI & Máy Trạng Thái `"Tiếp tục"`](#gate-5-thực-thi-nguyên-tử-bảo-toàn-11-ui--máy-trạng-thái-tiếp-tục)
-5. [Cơ chế Khóa 5 Lớp Ép AI Tuân Thủ 100% UI Prototype](#5-cơ-chế-khóa-5-lớp-ép-ai-tuân-thủ-100-ui-prototype)
-6. [Khôi phục Sự cố Giữa Chừng & Chạy Song Song Đa Agent (Git Worktree)](#6-khôi-phục-sự-cố-giữa-chừng--chạy-song-song-đa-agent-git-worktree)
-   - [6.1 Khôi phục Sự cố Tắt Máy / Đóng App Giữa Chừng (3-Step Crash Recovery)](#61-khôi-phục-sự-cố-tắt-máy--đóng-app-giữa-chừng-3-step-crash-recovery)
-   - [6.2 Chạy Song Song Nhiều AI Agent (Nhiều Tab hoặc Git Worktree)](#62-chạy-song-song-nhiều-ai-agent-nhiều-tab-hoặc-git-worktree)
-7. [Kiểm tra Tự động & Đồng bộ Hóa (`validate_plans.py`)](#7-kiểm-tra-tự-động--đồng-bộ-hóa-validate_planspy)
-8. [Cấu trúc Thư mục & Bảng Quy ước Định danh](#8-cấu-trúc-thư-mục--bảng-quy-ước-định-danh)
+1. [Bảng Tổng Hợp Các Lệnh `/ntc-*` (Slash Commands) & Khi Nào Sử Dụng](#1-bảng-tổng-hợp-các-lệnh-ntc--slash-commands--khi-nào-sử-dụng)
+2. [Sơ Đồ Quy Trình 6 Bước Của Plugin NTC Micro-Harness v2.1](#2-sơ-đồ-quy-trình-6-bước-của-plugin-ntc-micro-harness-v21)
+3. [Hướng Dẫn Cài Đặt 1 Lệnh Duy Nhất (Dự Án & Global Plugin)](#3-hướng-dẫn-cài-đặt-1-lệnh-duy-nhất-dự-án--global-plugin)
+4. [Chi Tiết Cách Sử Dụng Từng Bước (`/ntc-init` → `/ntc-run`)](#4-chi-tiết-cách-sử-dụng-từng-bước-ntc-init--ntc-run)
+5. [Cơ Chế Khóa 5 Lớp Ép AI Tuân Thủ 100% UI Prototype](#5-cơ-chế-khóa-5-lớp-ép-ai-tuân-thủ-100-ui-prototype)
+6. [Quản Lý Thay Đổi Giữa Chừng (`/ntc-cr`), Auto Git Commit & Khôi Phục Sự Cố](#6-quản-lý-thay-đổi-giữa-chừng-ntc-cr-auto-git-commit--khôi-phục-sự-cố)
+7. [Kiểm Thử Tích Hợp Liên Module & Full-Stack E2E (`/ntc-status --e2e`)](#7-kiểm-thử-tích-hợp-liên-module--full-stack-e2e-ntc-status---e2e)
+8. [Cấu Trúc Thư Mục & Bảng Quy Ước Định Danh](#8-cấu-trúc-thư-mục--bảng-quy-ước-định-danh)
 
 ---
 
-## 1. Giới thiệu & Tại sao cần NTC Micro Harness v2.0?
+## 1. Bảng Tổng Hợp Các Lệnh `/ntc-*` (Slash Commands) & Khi Nào Sử Dụng
 
-Khi xây dựng các dự án Full-stack hoặc hệ thống Microservices phức tạp, các AI Coding Agent thông thường rất dễ mắc 6 lỗi nghiêm trọng. **NTC Micro Harness v2.0** khắc phục triệt để cả 6 vấn đề này bằng cơ chế khóa cơ học:
+Khi cài đặt **NTC Micro-Harness v2.1**, 8 lệnh `/ntc-*` dưới đây sẽ sẵn sàng trong IDE của bạn (thông qua `.agents/skills/ntc-*/SKILL.md` và Global Plugin `~/.gemini/config/plugins/ntc-micro-harness`):
 
-| Điểm yếu của AI thông thường | Triệu chứng thực tế | Giải pháp của NTC Micro Harness v2.0 |
-| :--- | :--- | :--- |
-| **1. Vội vàng viết code khi chưa rõ thiết kế** | AI lao vào viết code ngay khi chưa có schema DB, state machine, edge cases và hợp đồng API giữa các module. | **Khóa Gate 1 → Gate 3:** Nghiêm cấm viết code sản phẩm cho đến khi hoàn tất `SPEC.md`, `system-roadmap.md`, `contract-registry.md`, và **toàn bộ** `docs/modules-spec/<slug>.md`. |
-| **2. Tự chế giao diện (UI) lệch ý người dùng** | Khi code Frontend, AI tự suy diễn bố cục, đổi màu sắc, thiếu trạng thái loading/empty/error khiến phải đập đi sửa lại nhiều lần. | **Khóa UI Prototype tại Gate 3.0 & Bảo toàn 1:1 tại Gate 5:** Tạo sẵn các file HTML/CSS tương tác (`docs/prototypes/<slug>/scr-<nn>-*.html`) kèm neo `data-testid` để bạn duyệt trước. Sang Gate 5, AI bắt buộc bê nguyên 1:1 DOM, class và `data-testid` vào Component thật. |
-| **3. Bỏ quên hoặc không dùng AI Skills** | AI không đọc các bộ kỹ năng (`.agents/skills/`) nên tự bịa ra các mẫu code thiếu nhất quán giữa các module. | **Gate 3.2 (`ai-skill-maps.md`):** AI dừng lại hỏi người dùng các trang web tìm skill, đề xuất danh sách skill để người dùng duyệt, cài đặt vào `.agents/skills/` và lập bảng ánh xạ bắt buộc trong `ai-skill-maps.md`. |
-| **4. Xáo trộn ngữ cảnh giữa Lập kế hoạch & Code** | Vừa code vừa nghĩ kế hoạch làm loãng context window và đứt mạch làm việc của lập trình viên. | **Gate 4 Sinh trước toàn bộ Phase Dossiers:** Mọi phase của **tất cả các module** đều được bóc tách sẵn thành các Atomic Tasks trước khi bước vào Gate 5. |
-| **5. Ôm đồm nhiều việc hoặc bắt gõ lệnh dài** | AI sửa 15 file cùng lúc đầy `// TODO`, hoặc bắt người dùng phải nhớ và gõ mã task dài dòng ở mỗi lượt. | **Máy trạng thái `"Tiếp tục"`:** Thực thi đúng `1 Lượt = 1 Atomic Task` kèm kiểm thử thực tế. Chỉ cần gõ `"tiếp tục"` để làm task kế tiếp; tự động dừng cứng khi hết phase và yêu cầu gõ `"tiếp tục phase <MOD>-P<NN+1>"` để chuyển phase. |
-| **6. Mất trạng thái khi sập IDE / mất điện** | Đang chạy dở task thì tắt máy hoặc hôm sau mở lại, AI viết đè hoặc làm hỏng phần code đang viết dở. | **Write-Ahead `🎫 Resume Ticket` + Khôi phục 3 bước:** Tự động đối chiếu `git status` / `git diff` trên các file mục tiêu để viết tiếp phần còn thiếu hoặc tự đánh dấu `[x]` nếu code đã pass test. |
+| Bước | Lệnh `/ntc-*` | Các Cờ (`--flags`) Hỗ Trợ | Khi Nào Sử Dụng? | Cách Sử Dụng & Hành Động Của Agent |
+| :--- | :--- | :--- | :--- | :--- |
+| **Bước 1** | **`/ntc-init`** | `--repo <git-url>` *(tùy chọn)*<br>`--idea "<mô tả>"`<br>`--no-ui`<br>`--approve` | Ngay khi bắt đầu dự án mới hoặc áp dụng Harness vào repo hiện có. | 1. **Hỏi link Git Repo dự án trước tiên** (có thể để trống) → Khởi tạo `git init` & kết nối `git remote add origin <url>` trước khi làm bất cứ việc gì.<br>2. Đọc yêu cầu cơ bản → Đặt 3–5 câu hỏi ngắn để làm rõ nghiệp vụ & kiến trúc.<br>3. Sinh [`PRD.md`](docs/templates/prd-template.md) và [`ARCHITECTURE.md`](docs/templates/architecture-template.md) để bạn duyệt. |
+| **Bước 2** | **`/ntc-prototype`** | `--screen <SCR-ID>`<br>`--revise "<góp ý>"`<br>`--approve` | Sau khi có `PRD.md` & `ARCHITECTURE.md` (nếu dự án có giao diện `UI Required: YES`). | 1. Dựa vào `PRD.md` & `ARCHITECTURE.md`, khóa Design Tokens trong [`docs/prototypes/registry.md`](docs/prototypes/registry.md) và tạo các bản HTML tương tác tại `docs/prototypes/<slug>/scr-<nn>-*.html` (đủ 4 trạng thái + `data-testid`).<br>2. Dùng `--revise "..."` để tinh chỉnh giao diện.<br>3. Dùng `--approve` để chốt (`APPROVED`) toàn bộ màn hình. |
+| **Bước 3** | **`/ntc-spec`** | `--skills-from "<url>"`<br>`--approve` | Sau khi đã chốt UI Prototype (`APPROVED`) (hoặc ngay sau Bước 1 nếu `--no-ui`). | 1. Tạo [`SPEC.md`](docs/templates/spec-template.md) tổng quan, kèm danh sách module trong [`docs/plans/system-roadmap.md`](docs/plans/system-roadmap.md) và hợp đồng [`docs/plans/contract-registry.md`](docs/plans/contract-registry.md) để bạn chốt.<br>2. Dựa trên `SPEC.md`, đề xuất các **AI Skills** tương ứng cho từng chức năng (module/service).<br>3. Khi bạn duyệt (`--approve`): Cài đặt skills vào `.agents/skills/` và tạo file hướng dẫn sử dụng skills [`ai-skill-maps.md`](docs/templates/ai-skill-maps-template.md). |
+| **Bước 4** | **`/ntc-modules`** | `--module <MOD>`<br>`--approve` | Sau khi đã chốt `SPEC.md` tổng quan và `ai-skill-maps.md`. | 1. Agent **đọc các Skills trong `ai-skill-maps.md`** của từng module, kết hợp với `SPEC.md` tổng quan và `UI Prototypes` đã chốt.<br>2. Viết đặc tả chi tiết [`docs/modules-spec/<slug>.md`](docs/templates/module-spec-template.md) cho từng chức năng (DDL Schema, API `CT-*`, màn hình `SCR-*`, State Machine, Given/When/Then, Chuỗi Pha `<MOD>-P<NN>`).<br>3. Khi bạn duyệt (`--approve`): Tự động sinh [`STEP-by-STEP.md`](docs/templates/step-by-step-template.md). |
+| **Bước 5** | **`/ntc-plan`** | `--module <MOD>`<br>`--verify` | Sau khi đã duyệt toàn bộ `docs/modules-spec/*.md` (Gate 4). | 1. Sinh 100% Hồ sơ Pha (`docs/plans/active/<slug>/phase-<NN>-*.md`) cho tất cả các module.<br>2. Bóc tách tới **Atomic Task cấp 4 (`<MOD>-P<NN>.<M>.<A>`)**, gắn link `SCR-<MOD>-<NN>` và lệnh kiểm thử.<br>3. Chạy `python scripts/validate_plans.py --fix` đảm bảo `0 violations`. |
+| **Bước 6** | **`/ntc-run`** *(hoặc gõ `"tiếp tục"`)* | `--module <MOD>`<br>`--phase <MOD>-P<NN>` | Trong suốt quá trình code dự án (Gate 5) cho đến khi hoàn thành. | 1. Đối soát 3-Step Crash Recovery từ `git status` / `HEAD`.<br>2. Thực thi **đúng 1 Atomic Task** (`1 Turn = 1 Task`), kích hoạt Skill trong `ai-skill-maps.md`, port **1:1 UI Prototype (`data-testid`)**.<br>3. Chạy test thực tế → tích `[x]` → cập nhật `🎫 Resume Ticket` → chạy `validate_plans.py --fix` → **Tự động `git commit` tạo điểm lui an toàn**. |
+| **Thay đổi (CR)** | **`/ntc-cr`** | `"<mô tả thay đổi>"`<br>`--approve-delta` | Bất cứ lúc nào ở Bước 5/6 khi muốn thêm tính năng mới, sửa API hoặc thêm màn hình mới. | Kích hoạt **Giao thức Mở khóa ngược Delta 4 bước (`CR-<NN>`)**:<br>1. Ghi log `CR-<NN>` vào `system-roadmap.md` & khoanh vùng ảnh hưởng.<br>2. Cập nhật chỉ phần Prototype (`SCR-*`) / Hợp đồng (`CT-*`) thay đổi.<br>3. Bổ sung Delta vào `SPEC.md` & `docs/modules-spec/<slug>.md`.<br>4. Nối thêm Delta Tasks/Phase Dossier mới (không sửa lịch sử đã `[x]`) và quay lại `/ntc-run`. |
+| **Kiểm tra & E2E** | **`/ntc-status`** | `--fix`<br>`--e2e` | Khi muốn xem tiến độ, đồng bộ bảng trạng thái, hoặc chạy pha khóa đuôi `SYS-P<FINAL>`. | - Mặc định / `--fix`: Chạy `python scripts/validate_plans.py --fix` và in bảng tiến độ toàn dự án.<br>- `--e2e`: Kích hoạt Pha đóng dự án (`SYS-P<FINAL>`) chạy tích hợp thật liên module (`CT-*`) và Full-Stack UI E2E (`SCR-*`). |
 
 ---
 
-## 2. Kiến trúc Cốt lõi & Hệ thống Phân cấp Sự thật (Hierarchy of Truth)
+## 2. Sơ Đồ Quy Trình 6 Bước Của Plugin NTC Micro-Harness v2.1
 
-Tài liệu trong dự án được phân tầng rõ ràng để AI chỉ cần nạp đúng phần ngữ cảnh cần thiết cho lượt chạy hiện tại:
+```mermaid
+flowchart TD
+    S1["1️⃣ Bước 1: /ntc-init<br/>Hỏi Git Repo (kết nối origin) + Yêu cầu cơ bản<br/>↔ Agent hỏi làm rõ → Sinh PRD.md & ARCHITECTURE.md"]
+    S2["2️⃣ Bước 2: /ntc-prototype<br/>Tạo & chỉnh sửa HTML UI Prototype từ PRD + ARCH<br/>👉 Duyệt --approve (Khóa SCR-MOD-NN)"]
+    S3["3️⃣ Bước 3: /ntc-spec<br/>Chốt SPEC.md tổng quan + Roadmap + Contracts<br/>👉 Đề xuất & cài Skills → Tạo ai-skill-maps.md"]
+    S4["4️⃣ Bước 4: /ntc-modules<br/>Đọc SPEC.md + ai-skill-maps.md + Prototypes<br/>👉 Tạo docs/modules-spec/*.md chi tiết & STEP-by-STEP.md"]
+    S5["5️⃣ Bước 5: /ntc-plan (Gate 4)<br/>Sinh 100% Phase Dossiers & WBS cấp 4<br/>👉 docs/plans/active/* & validate_plans.py = PASS"]
+    S6["6️⃣ Bước 6: /ntc-run / 'tiếp tục' (Gate 5)<br/>1 Turn = 1 Atomic Task + 1:1 UI + Test + Auto Git Commit<br/>👉 Khóa đuôi /ntc-status --e2e (SYS-P-FINAL)"]
+    CR["🔄 /ntc-cr 'yêu cầu mới'<br/>Mở khóa ngược Delta 4 bước (CR-NN)<br/>chỉ cập nhật phần thay đổi"]
 
-```text
-SPEC.md (Đặc tả Hệ thống Tối cao)
- ├─ AGENTS.md                                     Hợp đồng vận hành & Quy tắc kỷ luật bắt buộc cho AI
- ├─ docs/plans/system-roadmap.md                  Lộ trình Dự án (Global Phases, Module Registry, Active Work Pointer)
- ├─ docs/plans/contract-registry.md               Sổ đăng ký Hợp đồng Liên Module (CT-<PROVIDER>-<NN>)
- ├─ docs/prototypes/registry.md                   Sổ đăng ký Prototype Giao diện & Design Tokens (SCR-<MOD>-<NN>, nếu có UI)
- │   └─ docs/prototypes/<module-slug>/scr-*.html  File HTML/CSS Prototype tương tác đã duyệt (kèm neo data-testid)
- ├─ docs/modules-spec/<module-slug>.md            Đặc tả Chi tiết Module + Ánh xạ Màn hình UI + Bảng Chuỗi Pha (<MOD>-P<NN>)
- ├─ ai-skill-maps.md                              Bản đồ Kỹ năng AI của Dự án (.agents/skills/<skill>/SKILL.md)
- ├─ STEP-by-STEP.md                               Sổ tay Hướng dẫn dành riêng cho Người dùng (AI KHÔNG ĐƯỢC ĐỌC)
- └─ docs/plans/active/<module-slug>/
-     ├─ phase-01-<slug>.md                        Hồ sơ Pha Đang Chạy (IN_PROGRESS + 🎫 Resume Ticket thời gian thực)
-     └─ phase-02-<slug>.md                        Hồ sơ Pha Kế Tiếp đã sinh sẵn (PENDING)
-         └─ Major Task (<MOD>-P<NN>.<M>)
-             └─ Atomic Task (<MOD>-P<NN>.<M>.<A>) ──► 1 Lượt = 1 Task + Bảo toàn 1:1 UI Prototype + Bằng chứng chạy test
-                 ("tiếp tục phase ...")           ──► Tự động lưu trữ sang docs/plans/completed/<module-slug>/
+    S1 --> S2
+    S1 -- "--no-ui (Không có UI)" --> S3
+    S2 -- "Chốt UI (APPROVED)" --> S3
+    S3 -- "Chốt SPEC & Skills" --> S4
+    S4 -- "Duyệt Module Specs" --> S5
+    S5 -- "0 Violations" --> S6
+    S6 -. "Phát sinh tính năng mới" .-> CR
+    CR -. "Cập nhật Delta Prototype/Spec/WBS" .-> S6
 ```
 
-### Hệ thống Phân cấp Sự thật (Hierarchy of Truth)
-
-Tài liệu cấp dưới **tuyệt đối không được mâu thuẫn** với tài liệu cấp trên. Nếu phát hiện xung đột, AI phải **DỪNG LẠI NGAY và hỏi Kiến trúc sư Con người**:
-
-1. **`SPEC.md`** — Đặc tả hệ thống tối cao, phạm vi nghiệp vụ, yêu cầu giao diện (`UI Required: YES | NO`) và mục tiêu kiến trúc do con người định nghĩa.
-2. **`AGENTS.md`** — Hợp đồng vận hành, ranh giới hành vi và quy tắc thực thi bắt buộc đối với AI.
-3. **`docs/plans/system-roadmap.md`** — Lộ trình tổng thể của dự án: Danh mục Module, các Pha Toàn cục (`GP-<NN>`), đồ thị phụ thuộc, và **Con trỏ Công việc Hiện hành (Active Work Pointer)**.
-4. **`docs/plans/contract-registry.md`** — Sổ đăng ký toàn bộ API, sự kiện (Event) và Schema dùng chung giữa các module (`CT-<MOD>-<NN>`).
-5. **`docs/prototypes/registry.md` & `docs/prototypes/<module-slug>/scr-<nn>-*.html`** — Sổ đăng ký Hợp đồng Giao diện & Prototype (khi dự án có UI): khóa chặt Design Tokens (bảng màu, font chữ, khung layout), các trạng thái hiển thị (`default`, `loading`, `empty`, `error`) và các neo `data-testid` (`SCR-<MOD>-<NN>`) đã được bạn phê duyệt.
-6. **`docs/modules-spec/<module-slug>.md`** — Đặc tả chi tiết từng module: phạm vi, user stories, schema DB/lưu trữ chi tiết, hợp đồng cung cấp/tiêu thụ, ánh xạ màn hình UI (`SCR-<MOD>-<NN>`), biểu đồ tuần tự/state machine, tiêu chí nghiệm thu Given/When/Then, mã lỗi, và **Chuỗi Pha của Module** (`<MOD>-P<NN>`).
-7. **`ai-skill-maps.md`** — Bản đồ ánh xạ từng module và từng pha với các kỹ năng AI bắt buộc (`.agents/skills/<skill-name>/SKILL.md`).
-8. **`docs/plans/active/<module-slug>/phase-<NN>-<slug>.md`** — Hồ sơ Pha được sinh sẵn chứa các Major Tasks, Atomic Tasks (WBS cấp 4), đường dẫn `UI Prototype Reference`, và `🎫 Resume Ticket`.
-9. **`docs/plans/completed/<module-slug>/phase-<NN>-<slug>.md`** — Hồ sơ Pha đã hoàn thành và được lưu trữ (lịch sử kiểm toán bất biến).
-
-> [!IMPORTANT]
-> **Ranh giới Dành riêng cho Con người (`STEP-by-STEP.md`):** File `STEP-by-STEP.md` được sinh ra ở cuối Gate 3 **chỉ dành riêng cho bạn (Kiến trúc sư Con người)** đọc và copy câu lệnh. **AI Agent bị nghiêm cấm đọc file `STEP-by-STEP.md` trong suốt quá trình thực thi.**
+### Tại sao thứ tự `PRD & ARCH` → `Prototype` → `SPEC & Skills` → `Module Specs` lại tối ưu nhất?
+1. **Kết nối Git ngay từ giây đầu tiên (`/ntc-init`):** Đảm bảo mọi tài liệu kiến trúc và mọi Atomic Git Commit ở các bước sau đều gắn sẵn với kho lưu trữ Git (`origin`) của dự án.
+2. **Nhìn thấy giao diện trước khi khóa `SPEC.md` (`/ntc-prototype`):** Từ `PRD.md` và `ARCHITECTURE.md`, bạn được bấm thử trên HTML Prototype thật (`docs/prototypes/<slug>/scr-*.html`). Chỉnh sửa giao diện xong xuôi rồi mới đúc kết thành `SPEC.md` tổng quan sẽ giúp `SPEC.md` chính xác tuyệt đối, không phải sửa đi sửa lại.
+3. **Chọn Vũ khí (AI Skills) trước khi viết Thiết kế Chi tiết (`/ntc-spec` → `/ntc-modules`):** Khi chốt `SPEC.md` ở Bước 3, Agent biết rõ dự án gồm những chức năng (modules/services) nào để tìm và gán bộ Skills chuyên sâu vào `ai-skill-maps.md`. Nhờ đó, sang Bước 4 (`/ntc-modules`), Agent **đọc chính các Skills đó** để viết Schema DB, API Contract và kiến trúc chi tiết trong `docs/modules-spec/<slug>.md` chuẩn mực hơn gấp nhiều lần!
 
 ---
 
-## 3. Hướng dẫn Cài đặt 1 Lệnh Duy Nhất (Tất cả Môi trường)
+## 3. Hướng Dẫn Cài Đặt 1 Lệnh Duy Nhất (Dự Án & Global Plugin)
 
-Bạn chỉ cần **mở Terminal ngay tại thư mục dự án hiện tại của bạn** (dự án mới hoặc dự án đang có sẵn):
-
-```bash
-cd /duong-dan/toi/du-an-cua-ban
-```
-
-Sau đó **dán đúng 1 dòng lệnh** tương ứng với môi trường của bạn dưới đây. Lệnh sẽ tự động tải **NTC Micro Harness v2.0** từ GitHub về thư mục tạm, áp dụng bộ khung vào ngay thư mục dự án hiện tại (`.`), cấu hình quy tắc cho AI (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules`) và tự động dọn sạch file tạm!
-
----
+Mở Terminal tại thư mục dự án của bạn và chạy **1 dòng lệnh** tương ứng với hệ điều hành:
 
 ### 3.1 Windows PowerShell / PowerShell Core
-
-Mở **PowerShell** ngay tại thư mục dự án và dán lệnh:
-
 ```powershell
+# Cài đặt vào dự án hiện tại + Cài đặt Global Plugin cho Antigravity/Claude
 irm https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.ps1 | iex
 ```
-
-*(Hoặc nếu muốn dùng `git clone` trực tiếp trong PowerShell)*:
+*(Nếu đã clone repo về máy, chạy thêm `-InstallPlugin` và `-RepoUrl`)*:
 ```powershell
-git clone --depth 1 https://github.com/chien5572/ntc-micro-harness.git .ntc-tmp; & .\.ntc-tmp\install.ps1 -TargetPath .; Remove-Item -Recurse -Force .ntc-tmp
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -TargetPath "D:\du-an-moi" -RepoUrl "https://github.com/user/du-an-moi.git" -InstallPlugin
 ```
 
----
-
-### 3.2 Windows Command Prompt (CMD)
-
-Mở **CMD (`cmd.exe`)** ngay tại thư mục dự án và dán lệnh:
-
-```cmd
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.ps1 | iex"
-```
-
-*(Hoặc dùng `git` + `python` trong CMD)*:
-```cmd
-git clone --depth 1 https://github.com/chien5572/ntc-micro-harness.git .ntc-tmp && python .ntc-tmp\install.py --target . --agent all && rmdir /s /q .ntc-tmp
-```
-
----
-
-### 3.3 Linux / macOS / WSL / Git Bash
-
-Mở terminal **Bash** hoặc **Zsh** ngay tại thư mục dự án và dán lệnh:
-
+### 3.2 Linux / macOS / WSL / Git Bash
 ```bash
 curl -fsSL https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.sh | bash
 ```
 
-*(Hoặc nếu muốn dùng `git clone` trong Bash/Zsh)*:
+### 3.3 Lệnh Python Đa Nền Tảng (Hỗ trợ cờ `--plugin` và `--repo`)
 ```bash
-git clone --depth 1 https://github.com/chien5572/ntc-micro-harness.git .ntc-tmp && bash .ntc-tmp/install.sh . && rm -rf .ntc-tmp
+# Cài đặt từ xa bằng 1 dòng lệnh Python:
+python -c "import urllib.request as u; exec(u.urlopen('https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.py').read().decode('utf-8'))"
+
+# Hoặc chạy trực tiếp từ file install.py kèm kết nối Git Repo và cài Global Plugin:
+python install.py --target . --repo https://github.com/user/my-project.git --plugin
 ```
 
 ---
 
-### 3.4 Lệnh Python Đa Nền Tảng (Mọi Hệ Điều Hành)
+## 4. Chi Tiết Cách Sử Dụng Từng Bước (`/ntc-init` → `/ntc-run`)
 
-Nếu máy đã cài **Python 3.8+** (trên Windows, macOS, hoặc Linux), mở terminal tại thư mục dự án và dán:
-
-```bash
-python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.py').read())"
+### Bước 1: Khởi tạo Git, Điền yêu cầu cơ bản & Hỏi-Đáp tạo `PRD.md` + `ARCHITECTURE.md` (`/ntc-init`)
+Trong khung chat của AI Agent, nhập:
+```text
+/ntc-init
 ```
-*(Thay `python` bằng `python3` trên macOS/Linux nếu máy dùng lệnh `python3`).*
+*(Hoặc truyền trực tiếp: `/ntc-init --repo https://github.com/user/shop.git --idea "Hệ thống quản lý đơn hàng đa chi nhánh có Web Portal"`)*
+
+* **Việc Agent sẽ làm:**
+  1. Nếu bạn chưa nhập link Git repo, Agent sẽ hỏi bạn: **"Link Git Repo của dự án (có thể để trống nếu chỉ làm local)"** và **"Yêu cầu cơ bản của dự án"**.
+  2. Ngay khi bạn nhập, Agent chạy `git init` và kết nối `git remote add origin <repo-url>` **trước khi làm bất cứ việc gì khác**.
+  3. Agent đưa ra **3–5 câu hỏi ngắn gọn** để bạn làm rõ các điểm khuyết (phân quyền người dùng, luồng nghiệp vụ chính, công nghệ/DB muốn dùng, có giao diện UI hay không).
+  4. Từ câu trả lời của bạn, Agent tạo ra 2 file nền tảng tại gốc dự án: **`PRD.md`** và **`ARCHITECTURE.md`**.
 
 ---
 
-### 3.5 Tùy chọn Nâng cao & Các File Được Cài Đặt
-
-**Cơ chế an toàn cho dự án đang có sẵn:**
-- Nếu dự án của bạn đã có sẵn `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, hoặc `.windsurfrules`, bộ cài sẽ **nối thêm (append)** khối `<!-- HARNESS:BEGIN -->` vào cuối file mà không làm mất nội dung cũ của bạn.
-- Tạo đầy đủ cấu trúc `docs/WORKFLOW.md`, `docs/prototypes/registry.md`, `docs/modules-spec/README.md`, `docs/plans/system-roadmap.md`, `docs/plans/contract-registry.md`, toàn bộ mẫu trong `docs/templates/`, và công cụ kiểm tra `scripts/validate_plans.py`.
-
-Kiểm tra ngay sau khi cài đặt bằng lệnh:
-```bash
-python scripts/validate_plans.py
+### Bước 2: Tạo & Tinh chỉnh UI Prototype từ `PRD.md` và `ARCHITECTURE.md` (`/ntc-prototype`)
+*(Bỏ qua nếu dự án không có giao diện `--no-ui`)*
+```text
+/ntc-prototype
 ```
+* **Việc Agent sẽ làm:**
+  1. Dựa vào `PRD.md` và `ARCHITECTURE.md`, khởi tạo bảng Design Tokens và danh mục màn hình `SCR-<MOD>-<NN>` trong `docs/prototypes/registry.md`.
+  2. Sinh các file HTML/CSS tương tác tự chứa tại `docs/prototypes/<module-slug>/scr-<nn>-<slug>.html` có thanh chuyển đổi 4 trạng thái (`default`, `loading`, `empty`, `error`) và gắn đầy đủ neo `data-testid="scr-<nn>-..."`.
+* **Chỉnh sửa cho đến khi hài lòng:**
+  ```text
+  /ntc-prototype --screen SCR-WEB-01 --revise "Đổi sidebar sang màu tối và thêm bộ lọc theo ngày"
+  ```
+* **Chốt giao diện:**
+  ```text
+  /ntc-prototype --approve
+  ```
 
 ---
 
-## 4. Quy trình Thực thi Từng Bước (Gate 1 → Gate 5)
-
-```mermaid
-flowchart LR
-    S0["Bước 0<br/>Viết SPEC.md"] --> G1["Gate 1<br/>Đọc SPEC &<br/>Phân tích Kiến trúc"]
-    G1 --> G2["Gate 2<br/>System Roadmap &<br/>Contract Registry"]
-    G2 --> G3["Gate 3<br/>3.0 UI Prototypes (nếu có UI)<br/>3.1 Mọi Module SPECs<br/>3.2 ai-skill-maps.md<br/>3.3 STEP-by-STEP.md"]
-    G3 --> G4["Gate 4<br/>Sinh trước TOÀN BỘ<br/>Phase Dossiers (WBS)"]
-    G4 --> G5["Gate 5<br/>Code Nguyên Tử &<br/>1:1 UI Parity ('tiếp tục')"]
+### Bước 3: Tạo `SPEC.md` Tổng Quan & Ánh Xạ AI Skills cho Từng Module (`/ntc-spec`)
+```text
+/ntc-spec
 ```
-
-Thực hiện lần lượt từ Bước 0 đến Gate 5 như sau:
+* **Việc Agent sẽ làm:**
+  1. Kết hợp `PRD.md` + `ARCHITECTURE.md` + `UI Prototypes` đã chốt để tạo **`SPEC.md`** tổng quan, kèm bảng **Module Registry** trong `docs/plans/system-roadmap.md` và danh mục hợp đồng **`CT-*`** trong `docs/plans/contract-registry.md`.
+  2. Dựa vào các chức năng (modules/services) trong `SPEC.md`, Agent đề xuất **danh sách các AI Skills** tương ứng cho từng module (bạn có thể truyền thêm nguồn tìm kiếm qua `/ntc-spec --skills-from "https://skillsmp.com/search"`).
+* **Khi bạn xem và chốt:**
+  ```text
+  /ntc-spec --approve
+  ```
+  Agent cài đặt bộ skills vào `.agents/skills/<skill-name>/SKILL.md` và tạo file hướng dẫn sử dụng skills cho từng chức năng: **`ai-skill-maps.md`**.
 
 ---
 
-### Bước 0: Khởi tạo `SPEC.md`
-
-Copy file mẫu đặc tả ra thư mục gốc của dự án và điền yêu cầu bài toán, công nghệ sử dụng, cờ giao diện (`UI Required: YES | NO`), và các luồng nghiệp vụ chính:
-
-```bash
-# Trên Linux / macOS / Git Bash
-cp docs/templates/spec-template.md SPEC.md
-
-# Trên Windows PowerShell
-Copy-Item docs/templates/spec-template.md SPEC.md
+### Bước 4: Tạo SPEC Chi Tiết cho Từng Chức Năng (Module/Service) (`/ntc-modules`)
+```text
+/ntc-modules
 ```
+* **Việc Agent sẽ làm:**
+  1. Đọc `SPEC.md` tổng quan + **đọc các Skills đã gán cho từng module trong `ai-skill-maps.md`** + `docs/prototypes/registry.md`.
+  2. Tạo bản đặc tả chi tiết **`docs/modules-spec/<module-slug>.md`** cho từng chức năng (`system.md`, `auth.md`, `order.md`, `web.md`...) gồm đầy đủ DDL Database, API/Event Contracts `CT-*`, ánh xạ màn hình `SCR-*`, State Machine, Given/When/Then và chuỗi Phase `<MOD>-P<NN>`.
+* **Khi bạn duyệt:**
+  ```text
+  /ntc-modules --approve
+  ```
+  Agent tự động sinh sổ tay điều hành **`STEP-by-STEP.md`** cho các bước tiếp theo.
 
 ---
 
-### Gate 1: Tiếp nhận Đặc tả Gốc & Kiểm toán Kiến trúc
+### Bước 5: Sinh Toàn Bộ Hồ Sơ Pha & Bóc Tách WBS Cấp 4 (`/ntc-plan` — Gate 4)
+```text
+/ntc-plan
+```
+* **Việc Agent sẽ làm:**
+  1. Khởi tạo 100% file Phase Dossiers tại `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` cho toàn bộ các module trong dự án.
+  2. Chia nhỏ từng Major Task thành các **Atomic Tasks cấp 4 (`<MOD>-P<NN>.<M>.<A>`)**:
+     - `.1`: Định nghĩa Contract / Schema / DTO / Interface.
+     - `.2`: Triển khai Logic nghiệp vụ hoặc UI Component (gắn rõ `UI Prototype Reference: SCR-<MOD>-<NN>`).
+     - `.3`: Viết Unit / Component Test kiểm chứng thực tế.
+  3. Chạy `python scripts/validate_plans.py --fix` đảm bảo `PASSED: 0 violations`.
 
-Mở AI Coding Agent (Antigravity, Claude Code, Cursor, Windsurf) và dán câu lệnh sau:
+---
+
+### Bước 6: Thực Thi Nguyên Tử & Máy Trạng Thái `/ntc-run` / `"Tiếp tục"` (Gate 5)
+Khi bắt đầu code hoặc tiếp tục công việc, bạn chỉ cần gõ:
+```text
+/ntc-run
+```
+*(Hoặc gõ tự nhiên bằng tiếng Việt: **`tiếp tục`**, **`tiếp tục <MOD>`**)*
+
+* **Trong mỗi lượt chạy (`1 Turn = 1 Atomic Task`), Agent tự động:**
+  1. Kiểm tra **3-Step Crash Recovery** từ `git status` / `HEAD`.
+  2. Đọc Skill bắt buộc trong `ai-skill-maps.md` và (nếu là task UI) đọc file HTML Prototype `SCR-<MOD>-<NN>` để port **1:1 DOM + CSS + `data-testid`**.
+  3. Viết code hoàn chỉnh (cấm viết `// TODO`) và chạy lệnh kiểm thử thực tế (`Executable Proof Command`).
+  4. Đánh dấu `[x]`, cập nhật `🎫 Resume Ticket`, chạy `python scripts/validate_plans.py --fix`.
+  5. **Tự động tạo Atomic Git Commit (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - ..."`):** Biến `HEAD` thành điểm lui an toàn tuyệt đối!
+* **Khi hoàn thành task cuối cùng của một Phase:** Agent tự động dừng cứng và nhắc bạn gõ:
+  ```text
+  /ntc-run --phase <MOD>-P02
+  ```
+  *(Hoặc `tiếp tục phase <MOD>-P02`)* để tự động chuyển `phase-01` sang `docs/plans/completed/`, kích hoạt `phase-02` và làm luôn task đầu tiên của `phase-02`.
+
+---
+
+## 5. Cơ Chế Khóa 5 Lớp Ép AI Tuân Thủ 100% UI Prototype
+
+1. **Lớp 1 — Khóa Sổ đăng ký & Design Tokens (`docs/prototypes/registry.md`):** Mọi màn hình đều có mã `SCR-<MOD>-<NN>` và bảng màu/typography cố định ngay từ Bước 2 (`/ntc-prototype`).
+2. **Lớp 2 — Khóa Neo Kiểm thử `data-testid`:** Mọi phần tử quan trọng trong file `.html` prototype bắt buộc gắn `data-testid="scr-<nn>-<element>"`.
+3. **Lớp 3 — Khóa Kiểm tra Tự động (`scripts/validate_plans.py`):** Chặn cứng nếu màn hình còn ở trạng thái `DRAFT`, thiếu file `.html` trên ổ đĩa, hoặc trong file `.html` không có `data-testid=`.
+4. **Lớp 4 — Khóa Quy tắc 1:1 trong `AGENTS.md` & Skill `ui-prototype-fidelity`:** Bắt buộc Agent `read_file` bản HTML prototype ngay trong lượt code để chuyển đổi 1:1 vào React/Vue/Next.js/ Blade/Flutter.
+5. **Lớp 5 — Khóa Kiểm thử Component (Task `.3`) & Full-Stack E2E (`SYS-P<FINAL>`):** Bài test bắt buộc truy vấn đúng các neo `getByTestId('scr-...')` đã khóa.
+
+---
+
+## 6. Quản Lý Thay Đổi Giữa Chừng (`/ntc-cr`), Auto Git Commit & Khôi Phục Sự Cố
+
+### 6.1 Khi muốn thêm tính năng / thêm màn hình mới ở giữa Bước 5 hoặc Bước 6 (`/ntc-cr`)
+Chỉ cần gõ:
+```text
+/ntc-cr "Thêm màn hình Xuất báo cáo PDF và API thống kê doanh thu theo tháng"
+```
+*(Hoặc gõ: `yêu cầu thay đổi: Thêm màn hình Xuất báo cáo PDF...`)*
+
+Agent sẽ chạy **Giao thức Mở khóa ngược Delta 4 bước (`CR-<NN>`)** mà **không bao giờ xóa hay làm hỏng các task `[x]` đã hoàn thành**:
+1. **Bước 1:** Đăng ký mã `CR-01` vào `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) và khoanh vùng ảnh hưởng.
+2. **Bước 2:** Chỉ tạo/cập nhật file HTML Prototype (`SCR-*`) và Hợp đồng (`CT-*`) của phần thay đổi để bạn duyệt (`/ntc-cr --approve-delta`).
+3. **Bước 3:** Nối thêm đặc tả Delta vào `SPEC.md`, `docs/modules-spec/<slug>.md`, và nối thêm Tasks vào hồ sơ pha đang mở (hoặc tạo hồ sơ Delta Phase mới `phase-<NN+1>-cr-01-*.md` nếu các pha cũ đã đóng).
+4. **Bước 4:** Chạy `validate_plans.py --fix`, commit kế hoạch Delta và tiếp tục `/ntc-run`.
+
+### 6.2 Auto Git Commit & Khôi phục sự cố 3 bước (3-Step Crash Recovery)
+Nhờ việc mỗi Atomic Task `[x]` đều được `git commit` ngay cuối lượt chạy, mọi thay đổi chưa commit trong `git diff HEAD` đều thuộc 100% về đúng task đang chạy dở khi mất điện/tắt IDE. Khi bạn gõ `/ntc-run` hoặc `"tiếp tục"`, Agent tự động đối chiếu `HEAD` để viết nốt phần dở dang hoặc commit bù nếu code đã pass test.
+
+---
+
+## 7. Kiểm Thử Tích Hợp Liên Module & Full-Stack E2E (`/ntc-status --e2e`)
+
+Khi tất cả các module thành phần (`AUTH`, `ORD`, `WEB`...) đã hoàn thành các phase riêng và chuyển vào `docs/plans/completed/`, bạn chạy lệnh:
+```text
+/ntc-status --e2e
+```
+Agent sẽ kích hoạt Pha đóng dự án **`SYS-P<FINAL>`** của module `SYS` (`system`) để:
+1. Khởi chạy toàn bộ hệ thống thật (Database + Migrations + Backend Services + API Gateway + Frontend).
+2. Kiểm thử tích hợp thật các hợp đồng liên module (`CT-*`) không dùng mock.
+3. Chạy kịch bản E2E tự động (Playwright/Cypress) bấm trực tiếp vào các neo `data-testid="scr-<nn>-..."` từ Giao diện → gọi API → lưu Database → kiểm tra giao diện cập nhật đúng 4 trạng thái đã duyệt.
+
+---
+
+## 8. Cấu Trúc Thư Mục & Bảng Quy Ước Định Danh
 
 ```text
-Hãy đọc file `SPEC.md` và `AGENTS.md`.
-Thực hiện Gate 1 (Root Specification Ingestion):
-1. Phân tích kiến trúc hệ thống, ranh giới nghiệp vụ, phạm vi giao diện (`UI Required: YES | NO`) và các rủi ro kỹ thuật.
-2. Đề xuất danh sách các Module / Microservices (kèm Mã Module 2-5 chữ in hoa, slug, quyền sở hữu dữ liệu và trách nhiệm — giữ mã `SYS` / `system` cho phần nền tảng dùng chung).
-3. Nêu các câu hỏi cần làm rõ về nghiệp vụ hoặc luồng màn hình trước khi chuyển sang Gate 2.
-QUY TẮC TUYỆT ĐỐI: KHÔNG viết bất kỳ dòng code sản phẩm nào ở bước này.
-```
-
----
-
-### Gate 2: Lộ trình Hệ thống (`system-roadmap.md`) & Sổ đăng ký Hợp đồng (`contract-registry.md`)
-
-Sau khi trả lời các câu hỏi của AI và chốt danh sách module, bạn dán câu lệnh:
-
-```text
-Tôi đồng ý với đề xuất kiến trúc. Hãy chuyển sang Gate 2:
-1. Điền đầy đủ `docs/plans/system-roadmap.md` (theo mẫu `docs/templates/system-roadmap-template.md`) gồm Architecture Blueprint, Module Registry (trỏ tới `docs/modules-spec/<slug>.md`), Global Phases (`GP-01`, `GP-02`...), Module Dependency Graph và Active Work Pointer.
-2. Điền đầy đủ `docs/plans/contract-registry.md` (theo mẫu `docs/templates/contract-registry-template.md`) với toàn bộ các hợp đồng API/Event/Schema liên module (`CT-<PROVIDER>-<NN>`) ở trạng thái `DRAFT`.
-3. Chạy `python scripts/validate_plans.py` để kiểm tra tính hợp lệ và dừng lại chờ tôi duyệt Gate 2.
-```
-
----
-
-### Gate 3: UI Prototype (`3.0`), Đặc tả Module (`3.1`), `ai-skill-maps.md` (`3.2`), và `STEP-by-STEP.md` (`3.3`)
-
-Gate 3 gồm **4 bước con tuần tự** (`Bước 3.0` có điều kiện nếu dự án có giao diện người dùng → `3.1` → `3.2` → `3.3`):
-
-#### Bước 3.0 (Có điều kiện — Bắt buộc nếu Dự án có Giao diện UI): Tạo & Chốt UI Prototype (`docs/prototypes/`)
-
-- **Nếu dự án thuần Backend/CLI (`UI Required: NO`):** AI đánh dấu `> **UI Required:** NO` trong `docs/prototypes/registry.md` và chuyển thẳng sang **Bước 3.1**.
-- **Nếu dự án có giao diện người dùng (`UI Required: YES`):** Trước khi viết bất kỳ file `docs/modules-spec/*.md` nào, hãy yêu cầu AI tạo Prototype tương tác để bạn duyệt giao diện trước:
-
-```text
-Tôi duyệt Gate 2. Hãy thực hiện Gate 3 - Bước 3.0 (Tạo & Chốt UI Prototype):
-1. Điền `docs/prototypes/registry.md` (theo mẫu `docs/templates/ui-prototype-registry-template.md`) gồm Design System Tokens (bảng màu, font chữ, spacing, khung layout) và bảng danh mục màn hình (`SCR-<MOD>-<NN>`).
-2. Tạo các file HTML/CSS prototype tương tác độc lập tại `docs/prototypes/<module-slug>/scr-<nn>-<slug>.html` cho từng màn hình để tôi mở xem trực tiếp trên trình duyệt.
-3. Mỗi file `.html` BẮT BUỘC có đủ các trạng thái (`default`, `loading`, `empty`, `error`) và gắn thuộc tính `data-testid="scr-<nn>-<element>"` vào các vùng bố cục chính, form, input, nút bấm và bảng dữ liệu.
-4. DỪNG LẠI để tôi mở xem các file HTML trên trình duyệt, yêu cầu chỉnh sửa nếu cần và chốt (`Status: APPROVED` trong `docs/prototypes/registry.md`) trước khi sang Bước 3.1.
-```
-
-> [!NOTE]
-> Sau khi bạn mở các file `.html` trong `docs/prototypes/` xem trên trình duyệt và ưng ý 100%, hãy nhắn AI: *"Tôi duyệt toàn bộ giao diện prototype. Hãy chuyển trạng thái các màn hình trong `docs/prototypes/registry.md` sang `APPROVED` và bắt đầu Bước 3.1."*
-
-#### Bước 3.1: Sinh Đặc tả Chi tiết (`docs/modules-spec/<slug>.md`) cho TẤT CẢ các Module
-
-Dán câu lệnh:
-
-```text
-Hãy chuyển sang Gate 3 - Bước 3.1:
-Dựa trên `docs/templates/module-spec-template.md`, hãy khởi tạo file Đặc tả Chi tiết Module `docs/modules-spec/<module-slug>.md` cho TẤT CẢ các module đã đăng ký trong `docs/plans/system-roadmap.md` (bắt đầu từ `system.md`, sau đó đến từng module nghiệp vụ/UI).
-Mỗi file phải đầy đủ: Scope, User Stories, Tech Stack, Schema DB/DDL & Indexes chi tiết, Contracts & Events, Mục 5.4 UI Screen & Prototype Mapping (`SCR-<MOD>-<NN>`) đối với module UI, Sequence Diagrams & State Machine, Given/When/Then Acceptance Criteria, NFRs/Error Codes, và bảng Module Phase Sequence (`<MOD>-P<NN>`).
-Nếu dự án có nhiều module, hãy viết kỹ từng module (1–2 module mỗi lượt) cho đến khi 100% module có file trong `docs/modules-spec/`.
-Ngay khi viết xong toàn bộ `docs/modules-spec/*.md`, hãy DỪNG LẠI và hỏi tôi danh sách trang web/nguồn tìm kiếm AI Skills để bắt đầu Bước 3.2.
-```
-
-#### Bước 3.2: Tương tác Tìm kiếm Kỹ năng AI & Tạo `ai-skill-maps.md`
-
-Ngay khi tạo xong toàn bộ `docs/modules-spec/*.md`, AI sẽ **dừng lại và hỏi bạn** các địa chỉ website hoặc kho lưu trữ để tìm kiếm AI Skills. Bạn trả lời kèm các nguồn bạn muốn:
-
-```text
-Hãy tìm kiếm các AI Skills phù hợp với tech stack và nghiệp vụ của từng module từ các nguồn sau:
-- https://skillsmp.com/search
-- https://felo.ai/vi/skills
-- Thư mục `.agents/skills/` hoặc kho skill chính thức của framework
-Đồng thời đề xuất thêm các skill đặc thù cho dự án (như `atomic-harness-gatekeeper`, `<project>-domain-invariants`, và `ui-prototype-fidelity` nếu dự án có giao diện UI).
-Hãy lập bảng đề xuất danh sách Skill ánh xạ với từng module để tôi duyệt trước khi cài đặt và tạo file `ai-skill-maps.md`.
-```
-
-Sau khi xem bảng đề xuất skill của AI, bạn xác nhận duyệt:
-
-```text
-Tôi duyệt danh sách AI Skills này. Hãy thực hiện:
-1. Cài đặt / khởi tạo các file `.agents/skills/<skill-name>/SKILL.md` đã được duyệt.
-2. Tạo file `ai-skill-maps.md` ở thư mục gốc (theo mẫu `docs/templates/ai-skill-maps-template.md`).
-3. Chuyển ngay sang Gate 3 - Bước 3.3: Tạo file `STEP-by-STEP.md` ở thư mục gốc (theo mẫu `docs/templates/step-by-step-template.md`) dành cho Kiến trúc sư Con người, rồi chạy `python scripts/validate_plans.py --fix`.
-```
-
-#### Bước 3.3: Sổ tay Hướng dẫn Thực thi (`STEP-by-STEP.md`)
-
-- AI sẽ sinh ra file `STEP-by-STEP.md` ở thư mục gốc chứa sơ đồ thứ tự thực thi các module và các mẫu câu lệnh copy-paste đã được điền sẵn đúng tên module của dự án bạn.
-- **Lưu ý quan trọng:** File `STEP-by-STEP.md` chỉ dành cho **bạn (người dùng)** đọc và copy lệnh. AI Agent sẽ không bao giờ đọc file này.
-
----
-
-### Gate 4: Sinh trước Toàn bộ Hồ sơ Pha & WBS Nguyên tử cho Mọi Module
-
-Trước khi được phép viết bất kỳ dòng code sản phẩm nào ở Gate 5, AI phải sinh trước **toàn bộ các file Phase Dossiers (`docs/plans/active/<module-slug>/phase-<NN>-<slug>.md`) cho tất cả các phase của tất cả các module trong dự án**.
-
-Bạn có thể copy câu lệnh Gate 4 từ file `STEP-by-STEP.md` vừa được tạo (hoặc dùng lệnh dưới đây):
-
-```text
-Hãy chuyển sang Gate 4 (Sinh trước toàn bộ Phase Dossiers & WBS Nguyên tử cho toàn dự án):
-1. Đọc `AGENTS.md`, `ai-skill-maps.md` (kèm các file `.agents/skills/*/SKILL.md` tương ứng), `docs/plans/system-roadmap.md`, `docs/plans/contract-registry.md`, `docs/prototypes/registry.md`, và toàn bộ `docs/modules-spec/*.md`. (Tuyệt đối KHÔNG đọc `STEP-by-STEP.md`).
-2. Dựa trên `docs/templates/phase-dossier-template.md`, hãy khởi tạo TẤT CẢ các Phase Dossiers `docs/plans/active/<module-slug>/phase-<NN>-<slug>.md` cho MỌI phase của MỌI module trong dự án.
-3. Trong mỗi Phase Dossier, phân rã chi tiết thành các Major Tasks (`<MOD>-P<NN>.<M>`) và Atomic Micro-Tasks cấp 4 (`<MOD>-P<NN>.<M>.<A>`):
-   - `.1`: Định nghĩa Contract / Interface / Schema / Type (Contract-First)
-   - `.2`: Triển khai logic nghiệp vụ hoặc UI Component (đối với task UI, BẮT BUỘC điền rõ `UI Prototype Reference: SCR-<MOD>-<NN>` trỏ tới file `docs/prototypes/<module-slug>/scr-<nn>-*.html`)
-   - `.3`: Viết Unit Test / Component Test kèm lệnh kiểm chứng thực thi (assert đầy đủ các `data-testid` của Prototype đối với task UI)
-4. Đặt `phase-01` của module khởi đầu ở trạng thái `READY_TO_EXECUTE` và các phase kế tiếp (`phase-02`, `phase-03`...) ở trạng thái `PENDING`.
-5. Chạy `python scripts/validate_plans.py --fix` và báo cáo danh sách toàn bộ các Phase Dossiers đã tạo để tôi duyệt Gate 4.
-QUY TẮC TUYỆT ĐỐI: KHÔNG viết code sản phẩm ở Gate 4.
-```
-
----
-
-### Gate 5: Thực thi Nguyên tử, Bảo toàn 1:1 UI & Máy Trạng Thái `"Tiếp tục"`
-
-Khi toàn bộ Phase Dossiers đã sẵn sàng trong `docs/plans/active/` và `python scripts/validate_plans.py` báo `PASSED: 0 violations`, dự án chính thức mở khóa **Gate 5**.
-
-#### 1. Bắt đầu Pha đầu tiên của một Module (ví dụ `SYS-P01`)
-
-```text
-Gate 4 đã hoàn tất. Hãy bước vào Gate 5 và bắt đầu thực thi Phase `SYS-P01`:
-1. Đọc `ai-skill-maps.md` và kích hoạt các kỹ năng bắt buộc cho module `SYS` (`system`).
-2. Đọc `docs/modules-spec/system.md` và `docs/plans/active/system/phase-01-foundation.md`.
-3. Thực thi ĐÚNG 1 Atomic Task đầu tiên là `SYS-P01.1.1` (1 Lượt = 1 Atomic Task).
-4. Chạy lệnh kiểm thử thực tế (Executable Proof), đánh dấu `[x]`, cập nhật `🎫 Resume Ticket`, và chạy `python scripts/validate_plans.py --fix`.
-```
-
-#### 2. Thực thi tuần tự cực nhanh chỉ với lệnh `"tiếp tục"`
-
-Từ lúc này trở đi, bạn **không cần** phải gõ lại mã task dài dòng nữa. Ở mỗi lượt tiếp theo, bạn chỉ cần gõ:
-
-```text
-tiếp tục
-```
-*(Hoặc `"tiếp tục <MOD>"`, ví dụ `"tiếp tục AUTH"` / `"tiếp tục WEB"`, hoặc `"continue"`).*
-
-Mỗi lần bạn gõ `"tiếp tục"`, AI sẽ tự động:
-1. Kiểm tra `🎫 Resume Ticket` và chạy **Quy trình Đối soát Khôi phục Sự cố 3 Bước**.
-2. Cập nhật `🎫 Resume Ticket` sang `IN_PROGRESS` với mã Atomic Task đang làm (Write-Ahead).
-3. **Nếu task có `UI Prototype Reference` (`SCR-<MOD>-<NN>`):** Đọc ngay file `.html` prototype đã duyệt trong `docs/prototypes/<module-slug>/`, bê nguyên 1:1 cấu trúc DOM, CSS/Tailwind classes, các trạng thái (`default`/`loading`/`empty`/`error`) và các thuộc tính `data-testid` sang Component thực tế.
-4. Chạy lệnh Unit Test / Component Test để chứng minh code chạy đúng (`Executable Proof`).
-5. Đánh dấu `- [x]`, cập nhật `🎫 Resume Ticket` trỏ sang Atomic Task kế tiếp, chạy `python scripts/validate_plans.py --fix`, và **tự động tạo một Atomic Git Commit checkpoint** (`git commit -m "feat(<slug>): complete <MOD>-P<NN>.<M>.<A> - <summary>"`) trước khi dừng lại chờ bạn.
-
-#### 3. Hoàn thành Task Cuối cùng của một Phase & Chốt Chặn An Toàn (Hard Stop)
-
-Ở lượt chạy hoàn thành **Atomic Task cuối cùng** của một phase (ví dụ `AUTH-P01`):
-- AI đánh dấu `- [x]` cho task cuối cùng đó, chuyển `Lifecycle Status` trong `🎫 Resume Ticket` sang **`PHASE_COMPLETED`**, và tạo `git commit` checkpoint.
-- AI thông báo rõ ràng:
-  > *"Đã hoàn thành toàn bộ Atomic Tasks của Phase `AUTH-P01`. Vui lòng nhập `tiếp tục phase AUTH-P02` để lưu trữ phase hiện tại và chuyển sang phase kế tiếp."*
-- **Chốt chặn an toàn:** Khi một phase đã ở trạng thái `PHASE_COMPLETED` (không còn task `- [ ]` nào), nếu bạn vô tình gõ `"tiếp tục"` thông thường, AI **sẽ KHÔNG tự ý nhảy sang phase mới** mà dừng lại nhắc bạn nhập đúng lệnh chuyển phase.
-
-#### 4. Chuyển sang Phase Kế tiếp với lệnh `"tiếp tục phase <MOD>-P<NN+1>"`
-
-Để lưu trữ phase vừa xong và bắt đầu ngay phase tiếp theo, bạn gõ:
-
-```text
-tiếp tục phase AUTH-P02
-```
-*(Hoặc `"tiếp tục phase 02"`).*
-
-Chỉ trong **1 lượt duy nhất đó**, AI sẽ tự động thực hiện trọn gói:
-1. Di chuyển file hồ sơ `docs/plans/active/auth/phase-01-*.md` sang thư mục lưu trữ `docs/plans/completed/auth/phase-01-*.md`.
-2. Kích hoạt file hồ sơ `docs/plans/active/auth/phase-02-*.md` (`Lifecycle Status: IN_PROGRESS`).
-3. Chạy `python scripts/validate_plans.py --fix` để tự động đồng bộ bảng tiến độ trong `docs/modules-spec/auth.md` và `Active Work Pointer` trong `docs/plans/system-roadmap.md`.
-4. Thực thi ngay **Atomic Task đầu tiên (`AUTH-P02.1.1`)** của phase mới và tạo `git commit` checkpoint!
-
-#### 5. Pha Cuối `SYS`: Kiểm Thử Tích Hợp Liên Module & Full-Stack E2E (`SYS-P<FINAL>`)
-
-Sau khi tất cả các module nghiệp vụ và giao diện (`AUTH`, `ORD`, `WEB`...) đã hoàn thành các phase riêng và được lưu trữ vào `docs/plans/completed/<slug>/`, module `SYS` sẽ thực thi **Pha Khóa Đuôi (`SYS-P<FINAL>` ở Global Phase cuối cùng `GP-<FINAL>`)**:
-- Khởi chạy toàn bộ hệ thống thật (Database + Migrations + Message Broker + Backend Services + API Gateway + Frontend).
-- Chạy kiểm thử tích hợp hợp đồng liên module (`CT-*`) trực tiếp giữa các service thật (không dùng mock).
-- Chạy kiểm thử E2E toàn trình trên trình duyệt (Playwright/Cypress) bám theo đúng các neo **`data-testid="scr-<nn>-..."`** đã khóa trong `docs/prototypes/registry.md`: từ thao tác click trên Frontend $\rightarrow$ gọi API (`CT-*`) $\rightarrow$ lưu Database $\rightarrow$ cập nhật trạng thái giao diện (`default`, `loading`, `empty`, `error`).
-
-#### 6. Yêu Cầu Thay Đổi Giữa Chừng (Mid-Flight Change Request — `CR-<NN>`)
-
-Nếu đang ở Gate 5 mà bạn muốn **thêm tính năng mới, thay đổi luồng nghiệp vụ liên module, hoặc thêm/sửa màn hình UI**, bạn chỉ cần gõ:
-
-```text
-yêu cầu thay đổi: <mô tả tính năng mới, thay đổi API hoặc màn hình UI muốn thêm/sửa>
-```
-*(Hoặc `"change request: <mô tả>"`).*
-
-AI sẽ **tuyệt đối không** sửa đè hay bỏ tích `[x]` các task đã làm xong hoặc các hồ sơ đã lưu trong `docs/plans/completed/`. Thay vào đó, AI tự động chạy **Quy trình Mở Khóa Ngược Delta 4 Bước (`CR-<NN>`)**:
-1. **Đóng băng & Phân tích Phạm vi Ảnh hưởng (Delta Audit):** Tạm dừng viết code Gate 5, ghi nhận mã `CR-<NN>` (ví dụ `CR-01`) vào bảng `## 6. Change Request (CR) Log` trong `docs/plans/system-roadmap.md` và xác định các hợp đồng `CT-*`, màn hình `SCR-*`, và module bị ảnh hưởng.
-2. **Cập nhật Delta UI Prototype & Contract trước:** Chỉ tạo mới hoặc cập nhật các file `.html` prototype bị ảnh hưởng trong `docs/prototypes/<slug>/` để bạn mở trình duyệt duyệt (`APPROVED`), đồng thời cập nhật `docs/plans/contract-registry.md`.
-3. **Bổ sung nối tiếp (Append-Only) vào Spec & Phase Dossier:** Cập nhật các file `docs/modules-spec/<slug>.md` liên quan và nối thêm Major/Atomic Tasks vào hồ sơ pha đang mở — hoặc tự động tạo một **Hồ sơ Pha Delta mới (`phase-<NN+1>-cr-<nn>-*.md`)** trong `docs/plans/active/<slug>/` nếu toàn bộ các pha trước của module đó đã đóng vào `completed/`.
-4. **Kiểm tra & Tiếp tục Gate 5:** Chạy `python scripts/validate_plans.py --fix`, `git commit` kế hoạch Delta, và sẵn sàng để bạn gõ `"tiếp tục"` chạy tiếp ngay!
-
----
-
-## 5. Cơ chế Khóa 5 Lớp Ép AI Tuân Thủ 100% UI Prototype
-
-Để ngăn chặn triệt để tình trạng AI "quên" giao diện mẫu hoặc tự ý sửa đổi bố cục khi sang Gate 5, **NTC Micro Harness v2.0** áp dụng **5 lớp bảo vệ đa tầng**:
-
-| Lớp khóa | Nơi áp dụng | Cách thức ép AI tuân thủ 100% |
-| :--- | :--- | :--- |
-| **Lớp 1: Hợp đồng Giao diện (`SCR-<MOD>-<NN>`)** | `docs/prototypes/registry.md` & `docs/prototypes/<slug>/scr-<nn>-*.html` | Khóa chặt Design Tokens (bảng màu, font, bo góc, layout khung) và gán mã định danh `SCR-<MOD>-<NN>` cho từng màn hình. Phải đạt trạng thái `APPROVED` trước khi sang Bước 3.1. |
-| **Lớp 2: Nhúng đường dẫn vào từng Atomic Task** | `docs/modules-spec/<slug>.md` (§5.4) & `phase-<NN>-*.md` (§3) | Mỗi Atomic Task giao diện đều có dòng `- **UI Prototype Reference:** SCR-<MOD>-<NN> (docs/prototypes/...)`. Khi bạn gõ `"tiếp tục"`, mắt AI nhìn thấy ngay đường dẫn file `.html` cần đọc trong lượt đó. |
-| **Lớp 3: Khóa DOM bằng neo `data-testid`** | File HTML Prototype → Component thật → Unit Test (`.3`) | File HTML prototype bắt buộc gắn `data-testid="scr-<nn>-<element>"`. Component thật ở Gate 5 phải giữ nguyên các `data-testid` này, và Task `.3` (Unit/Component Test) bắt buộc assert sự tồn tại của chúng. |
-| **Lớp 4: Luật trong `AGENTS.md` & Skill `ui-prototype-fidelity`** | `AGENTS.md`, `ai-skill-maps.md`, `STEP-by-STEP.md` | Quy định luật **1:1 UI Prototype Parity Invariant**: bắt buộc đọc file `.html` gốc ngay trong lượt code, bê nguyên cấu trúc DOM/class và cấm tự ý đổi thiết kế. |
-| **Lớp 5: Kiểm tra cơ học bằng `validate_plans.py`** | `python scripts/validate_plans.py` | Tự động chặn đứng Gate 4/5 nếu có màn hình còn ở trạng thái `DRAFT` (`PROTOTYPE_NOT_APPROVED`), nếu thiếu file `.html` trên ổ cứng (`PROTOTYPE_FILE_MISSING`), hoặc nếu file `.html` quên gắn `data-testid=` (`PROTOTYPE_TESTID_MISSING`). |
-
----
-
-## 6. Khôi phục Sự cố Giữa Chừng & Chạy Song Song Đa Agent (Git Worktree)
-
-### 6.1 Tự động Git Commit Checkpoint & Khôi phục Sự cố 3 Bước (3-Step Crash Recovery)
-
-Nhờ quy tắc **tự động `git commit` sau mỗi Atomic Task hoàn thành (`[x]`)**, nhánh `HEAD` trên Git luôn là điểm neo sạch đã pass test 100%. Nếu đang chạy dở một Atomic Task mà IDE bị treo, mất điện hoặc mất mạng giữa chừng, **mọi thay đổi chưa commit trong `git status` / `git diff HEAD` chắc chắn 100% thuộc về đúng Atomic Task đang bị ngắt quãng đó** (không bao giờ bị lẫn với các task đã làm xong trước đó).
-
-Khi mở lại dự án, bạn chỉ cần gõ:
-
-```text
-tiếp tục
-```
-
-Trước khi sửa bất kỳ file nào, AI bắt buộc thực hiện **3 bước đối soát thực tế so với `HEAD`**:
-1. **Đọc Hồ sơ Pha đang mở:** Xác định Atomic Task `- [ ]` đầu tiên chưa tích chọn và danh sách `Target Files` của task đó.
-2. **Kiểm tra Cây thư mục Git so với `HEAD` (`git status --short` & `git diff HEAD`):** Kiểm tra xem các file mục tiêu trong `Code Root` của module đã bị sửa đổi gì so với commit `HEAD` gần nhất chưa.
-3. **Tự động xử lý thông minh:**
-   - **Trường hợp 1 (Chưa có file nào bị sửa so với `HEAD`):** Thực thi Atomic Task đó từ đầu như bình thường và `git commit` ở cuối lượt.
-   - **Trường hợp 2 (Code đã được viết xong trước khi sập máy và chạy Test PASS):** Tự động tích chọn `- [x]` cho task đó, tạo bù bản `git commit` checkpoint cho task vừa khôi phục, ghi nhận vào nhật ký, và chuyển sang làm luôn Atomic Task kế tiếp ngay trong lượt đó.
-   - **Trường hợp 3 (Code đang viết dở dang hoặc Test đang FAIL):** Báo cáo ngắn gọn 3 dòng (*Module/Phase/Task đang dở, file/dòng bị ngắt quãng so với `HEAD`, và hướng xử lý*), sau đó **viết nốt phần logic còn thiếu** của đúng Atomic Task đó mà không làm mất hay nhân đôi code đã viết.
-
----
-
-### 6.2 Chạy Song Song Nhiều AI Agent (Nhiều Tab hoặc Git Worktree)
-
-Ngay khi các hợp đồng nền tảng ở `GP-01` (`SYS-P01`) đã được định nghĩa xong và chuyển sang trạng thái `AVAILABLE` trong `docs/plans/contract-registry.md`, bạn có thể mở **nhiều AI Agent chạy song song** cho các module độc lập (ví dụ: Agent 1 làm `AUTH`, Agent 2 làm `ORD`, Agent 3 làm `WEB`):
-
-#### Cách A: Mở nhiều Tab Chat AI trong cùng Workspace
-Ở mỗi tab chat, chỉ định rõ mã module khi gõ lệnh:
-- **Tab 1:** `"tiếp tục AUTH"`
-- **Tab 2:** `"tiếp tục WEB"`
-
-Vì mỗi module chỉ được phép sửa code trong `Code Root` riêng của nó (ví dụ `services/auth/` và `services/web/`) và hồ sơ pha riêng (`docs/plans/active/auth/` và `docs/plans/active/web/`), các Agent hoàn toàn không bao giờ đụng độ file của nhau.
-
-#### Cách B: Cô lập hoàn toàn bằng Git Worktree (Khuyên dùng khi chạy build/test nặng)
-Tại thư mục gốc của dự án, tách nhánh Worktree riêng cho từng module:
-
-```bash
-git worktree add ../du-an-auth -b feat/auth main
-git worktree add ../du-an-web -b feat/web main
-```
-
-Mở cửa sổ IDE / AI Agent riêng trong từng thư mục Worktree và gõ `"tiếp tục AUTH"` / `"tiếp tục WEB"`. Khi một module hoàn thành toàn bộ các phase:
-
-```bash
-python scripts/validate_plans.py --fix
-git add . && git commit -m "feat(auth): hoan thanh toan bo cac phase cua module AUTH"
-# Quay về thư mục dự án chính để gộp nhánh:
-git checkout main
-git merge --no-ff feat/auth
-git worktree remove ../du-an-auth
-```
-
----
-
-## 7. Kiểm tra Tự động & Đồng bộ Hóa (`validate_plans.py`)
-
-Bộ khung đi kèm công cụ kiểm tra cấu trúc và tự động đồng bộ trạng thái viết bằng Python thuần (không cần cài thêm thư viện ngoài):
-
-```bash
-# 1. Kiểm tra toàn bộ cấu trúc kế hoạch, module specs, hợp đồng, UI prototypes và hồ sơ pha
-python scripts/validate_plans.py
-
-# 2. Tự động đồng bộ bảng tiến độ trong docs/modules-spec/*.md và Active Work Pointer trong system-roadmap.md
-python scripts/validate_plans.py --fix
-```
-
-**Những gì `scripts/validate_plans.py` tự động kiểm tra:**
-- `AGENTS.md` giữ nguyên khối hợp đồng `<!-- HARNESS:BEGIN -->` ... `<!-- HARNESS:END -->`.
-- Mọi module trong `docs/plans/system-roadmap.md` đều có file đặc tả `docs/modules-spec/<slug>.md` hợp lệ.
-- Mọi hợp đồng liên module trong `docs/plans/contract-registry.md` (`CT-<MOD>-<NN>`) có file spec thực tế trên ổ cứng khi ở trạng thái `AVAILABLE`.
-- Mọi màn hình giao diện trong `docs/prototypes/registry.md` (`SCR-<MOD>-<NN>`) đều thuộc về module đã đăng ký, có file `.html` thực tế chứa thuộc tính `data-testid="..."` khi `APPROVED`, và không còn màn hình nào ở trạng thái `DRAFT` khi module đó đã bước sang Gate 4/5.
-- Khi đã có Phase Dossiers (Gate 4/5), bắt buộc phải tồn tại `ai-skill-maps.md` và `STEP-by-STEP.md` ở thư mục gốc.
-
----
-
-## 8. Cấu trúc Thư mục & Bảng Quy ước Định danh
-
-### Cấu trúc Thư mục
-
-```text
-.
-├── AGENTS.md                                      # Hợp đồng vận hành & Quy tắc kỷ luật cho AI (v2.0)
-├── README.md                                      # Tài liệu hướng dẫn tiếng Anh (English)
-├── README.vi.md                                   # Tài liệu hướng dẫn tiếng Việt (Vietnamese)
+your-project/
+├── plugin.json                                     # Manifest của Plugin NTC Micro-Harness v2.1
+├── PRD.md                                          # [Bước 1: /ntc-init] Tài liệu Yêu cầu Sản phẩm
+├── ARCHITECTURE.md                                 # [Bước 1: /ntc-init] Bản thiết kế Kiến trúc & Topology
+├── SPEC.md                                         # [Bước 3: /ntc-spec] Đặc tả Hệ thống Tổng quan Tối cao
+├── ai-skill-maps.md                                # [Bước 3: /ntc-spec] Bản đồ Kỹ năng AI cho từng Module/Service
+├── STEP-by-STEP.md                                 # [Bước 4: /ntc-modules] Sổ tay Hướng dẫn cho Người dùng (AI cấm đọc)
+├── AGENTS.md                                       # Hợp đồng vận hành 6 bước bắt buộc cho AI Agent
+├── skills/                                         # Bộ 8 Slash Command Skills (/ntc-init .. /ntc-status)
+├── .agents/skills/                                 # Các kỹ năng AI đã cài đặt cho dự án
 ├── docs/
-│   ├── WORKFLOW.md                                # Đặc tả chi tiết giao thức 5 cổng, UI parity & khôi phục sự cố
-│   ├── README.md                                  # Bản đồ thư mục tài liệu
-│   ├── prototypes/                                # Sổ đăng ký UI Prototype & các file HTML mẫu (Gate 3.0)
-│   │   ├── README.md
-│   │   └── registry.md                            # Danh mục màn hình (SCR-<MOD>-<NN>) & Design System Tokens
-│   ├── modules-spec/                              # Đặc tả chi tiết từng Module (docs/modules-spec/<slug>.md)
-│   │   └── README.md
-│   ├── patterns/
-│   │   └── encoding-invariants.md                 # Các mẫu bất biến kỹ thuật & kiểm chứng cơ học
+│   ├── WORKFLOW.md                                 # Quy trình vận hành chi tiết 6 bước
+│   ├── prototypes/                                 # [Bước 2: /ntc-prototype]
+│   │   ├── registry.md                             # Sổ đăng ký UI Prototype & Design Tokens (SCR-<MOD>-<NN>)
+│   │   └── <module-slug>/scr-<nn>-<slug>.html      # Các bản HTML/CSS Prototype tương tác có data-testid
+│   ├── modules-spec/                               # [Bước 4: /ntc-modules]
+│   │   ├── system.md                               # Đặc tả module SYS (Mở đầu hạ tầng & Khóa đuôi E2E)
+│   │   └── <module-slug>.md                        # Đặc tả chi tiết từng Module + Bảng Chuỗi Pha (<MOD>-P<NN>)
 │   ├── plans/
-│   │   ├── system-roadmap.md                      # Lộ trình Hệ thống, Module Registry & Active Work Pointer
-│   │   ├── contract-registry.md                   # Sổ đăng ký hợp đồng API/Event/Schema liên module
-│   │   ├── active/                                # Hồ sơ các phase đang chạy hoặc chờ chạy (<slug>/phase-<NN>-*.md)
-│   │   └── completed/                             # Hồ sơ các phase đã hoàn thành & lưu trữ
-│   └── templates/
-│       ├── spec-template.md                       # Mẫu SPEC.md gốc
-│       ├── system-roadmap-template.md             # Mẫu lộ trình hệ thống
-│       ├── contract-registry-template.md          # Mẫu sổ đăng ký hợp đồng liên module
-│       ├── ui-prototype-registry-template.md      # Mẫu sổ đăng ký UI Prototype & Design System
-│       ├── module-spec-template.md                # Mẫu đặc tả chi tiết module (docs/modules-spec/<slug>.md)
-│       ├── ai-skill-maps-template.md              # Mẫu bản đồ kỹ năng AI (ai-skill-maps.md)
-│       ├── step-by-step-template.md               # Mẫu sổ tay hướng dẫn cho người dùng (STEP-by-STEP.md)
-│       ├── phase-dossier-template.md              # Mẫu hồ sơ pha + Resume Ticket + WBS + UI Prototype Reference
-│       ├── decision.md                            # Mẫu ghi nhận quyết định kiến trúc (ADR)
-│       ├── exec-plan.md                           # Mẫu kế hoạch thực thi nhanh
-│       └── application-runbook.md                 # Mẫu sổ tay vận hành & xử lý sự cố
-├── scripts/
-│   └── validate_plans.py                          # Công cụ kiểm tra cấu trúc & tự động đồng bộ (--fix)
-├── install.py                                     # Trình cài đặt Python đa nền tảng (hỗ trợ chạy 1 lệnh từ xa)
-├── install.ps1                                    # Trình cài đặt Windows PowerShell (hỗ trợ chạy 1 lệnh từ xa)
-├── install.sh                                     # Trình cài đặt Linux / macOS / WSL Bash (hỗ trợ chạy 1 lệnh từ xa)
-└── LICENSE                                        # Giấy phép MIT
+│   │   ├── system-roadmap.md                       # Lộ trình Dự án, Active Work Pointer & Nhật ký CR-<NN>
+│   │   ├── contract-registry.md                    # Sổ đăng ký Hợp đồng Liên Module (CT-<PROVIDER>-<NN>)
+│   │   ├── active/<module-slug>/phase-<NN>-*.md    # [Bước 5: /ntc-plan] Hồ sơ Pha & WBS cấp 4 + 🎫 Resume Ticket
+│   │   └── completed/<module-slug>/phase-<NN>-*.md # [Bước 6: /ntc-run] Hồ sơ Pha đã nghiệm thu & lưu trữ
+│   └── templates/                                  # Bộ mẫu tài liệu chuẩn (PRD, ARCH, SPEC, Prototype, Module, WBS)
+└── scripts/
+    └── validate_plans.py                           # Công cụ kiểm tra & tự động đồng bộ trạng thái (--fix)
 ```
-
-### Bảng Quy ước Định danh (Identifier Convention)
-
-| Cấp độ | Định dạng | Ví dụ | File Quản lý Chính thức |
-| :--- | :--- | :--- | :--- |
-| **Pha Toàn cục (Global Phase)** | `GP-<NN>` | `GP-01` | `docs/plans/system-roadmap.md` |
-| **Mã Module / Slug** | `<MOD>` / `<slug>` | `AUTH` / `auth` | `docs/plans/system-roadmap.md` & `docs/modules-spec/auth.md` |
-| **Pha của Module (Module Phase)** | `<MOD>-P<NN>` | `AUTH-P01` | `docs/plans/active/auth/phase-01-*.md` |
-| **Tác vụ Lớn (Major Task)** | `<MOD>-P<NN>.<M>` | `AUTH-P01.2` | `docs/plans/active/auth/phase-01-*.md` |
-| **Tác vụ Nguyên tử (Atomic Task)** | `<MOD>-P<NN>.<M>.<A>` | `AUTH-P01.2.3` | `docs/plans/active/auth/phase-01-*.md` (**1 Lượt = 1 Task**) |
-| **Tác vụ Bổ sung Động (Hotfix)** | `<MOD>-P<NN>.<M>.<A>[a-z]` | `AUTH-P01.2.3a` | `docs/plans/active/auth/phase-01-*.md` |
-| **Hợp đồng Liên Module (Contract)** | `CT-<PROVIDER>-<NN>` | `CT-AUTH-01` | `docs/plans/contract-registry.md` |
-| **Nguyên mẫu Màn hình (UI Prototype)** | `SCR-<MOD>-<NN>` | `SCR-WEB-01` | `docs/prototypes/registry.md` (`docs/prototypes/<slug>/scr-<nn>-*.html`) |
-| **Yêu cầu Thay đổi Giữa chừng (Change Request)** | `CR-<NN>` | `CR-01` | `docs/plans/system-roadmap.md` (`## 6. Change Request (CR) Log`) |
 
 ---
 
 ## Giấy phép (License)
 
-Phát hành theo giấy phép [MIT License](LICENSE). Bản quyền (c) 2026 [chien5572](https://github.com/chien5572).
+Phát hành theo giấy phép **MIT License**. Xem chi tiết tại file [`LICENSE`](LICENSE).

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# NTC Micro Harness v2.0 - Automated Bash Installer (Linux / macOS / WSL / Git Bash)
+# NTC Micro Harness v2.1 (Plugin Edition) - Automated Bash Installer
 # Supports both local execution and remote 1-liner execution (`curl -fsSL ... | bash`)
 # ==============================================================================
 set -euo pipefail
@@ -26,7 +26,7 @@ if [ -n "${SCRIPT_DIR}" ] && [ -f "${SCRIPT_DIR}/AGENTS.md" ] && [ -f "${SCRIPT_
     SOURCE_DIR="${SCRIPT_DIR}"
 else
     TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'ntc-harness')"
-    echo "[*] Fetching NTC Micro Harness v2.0 from ${REPO_GIT_URL} ..."
+    echo "[*] Fetching NTC Micro Harness v2.1 from ${REPO_GIT_URL} ..."
     if command -v git >/dev/null 2>&1; then
         git clone --depth 1 --quiet "${REPO_GIT_URL}" "${TMP_DIR}/repo"
         SOURCE_DIR="${TMP_DIR}/repo"
@@ -40,7 +40,7 @@ mkdir -p "${TARGET_DIR}"
 TARGET_DIR="$(cd "${TARGET_DIR}" && pwd)"
 
 echo "=========================================================="
-echo " Installing NTC Micro Harness v2.0 into: ${TARGET_DIR}"
+echo " Installing NTC Micro Harness v2.1 into: ${TARGET_DIR}"
 echo "=========================================================="
 
 # 1. Install or update AGENTS.md
@@ -71,6 +71,8 @@ DOCS_ITEMS=(
     "plans/system-roadmap.md"
     "plans/active/README.md"
     "plans/completed/README.md"
+    "templates/prd-template.md"
+    "templates/architecture-template.md"
     "templates/application-runbook.md"
     "templates/contract-registry-template.md"
     "templates/ui-prototype-registry-template.md"
@@ -107,17 +109,31 @@ if [ -f "${SOURCE_DIR}/scripts/validate_plans.py" ]; then
     fi
 fi
 
-# 4. Agent rule files
+# 4. Install /ntc-* Slash Command Skills into workspace (.agents/skills/)
+NTC_SKILLS=("ntc-init" "ntc-prototype" "ntc-spec" "ntc-modules" "ntc-plan" "ntc-run" "ntc-cr" "ntc-status")
+for skill in "${NTC_SKILLS[@]}"; do
+    SRC_SKILL="${SOURCE_DIR}/skills/${skill}/SKILL.md"
+    DST_SKILL="${TARGET_DIR}/.agents/skills/${skill}/SKILL.md"
+    if [ -f "${SRC_SKILL}" ]; then
+        mkdir -p "$(dirname "${DST_SKILL}")"
+        if [ ! -f "${DST_SKILL}" ]; then
+            cp "${SRC_SKILL}" "${DST_SKILL}"
+            echo "  [+] Installed slash skill /${skill} -> .agents/skills/${skill}/SKILL.md"
+        fi
+    fi
+done
+
+# 5. Agent rule files
 AGENT_FILES=(".cursorrules" "CLAUDE.md" ".windsurfrules")
 for rule_file in "${AGENT_FILES[@]}"; do
     DST_RULE="${TARGET_DIR}/${rule_file}"
     if [ ! -f "${DST_RULE}" ]; then
         cat << 'EOF' > "${DST_RULE}"
 <!-- HARNESS:BEGIN -->
-Always adhere strictly to the Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
-- Hierarchy of Truth: `SPEC.md` > `AGENTS.md` > `docs/plans/system-roadmap.md` > `docs/plans/contract-registry.md` > `docs/prototypes/registry.md` > `docs/modules-spec/<slug>.md` > `ai-skill-maps.md` > `docs/plans/active/<slug>/phase-*.md`.
+Always adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md` and `docs/WORKFLOW.md`.
+- Slash Commands: `/ntc-init` (Step 1: Git remote + Q&A -> `PRD.md` & `ARCHITECTURE.md`) -> `/ntc-prototype` (Step 2: HTML UI Prototypes `SCR-<MOD>-<NN>`) -> `/ntc-spec` (Step 3: Overall `SPEC.md` + `ai-skill-maps.md`) -> `/ntc-modules` (Step 4: `docs/modules-spec/<slug>.md` + `STEP-by-STEP.md`) -> `/ntc-plan` (Step 5: All Phase Dossiers WBS) -> `/ntc-run` (Step 6: `1 Turn = 1 Atomic Task`).
 - Note: `STEP-by-STEP.md` is strictly for the Human Architect; AI Agents must NOT read it.
-- Implement exactly ONE Atomic Task per turn (with 1:1 UI Prototype Parity for `SCR-<MOD>-<NN>` tasks and `CR-<NN>` Delta Change Request handling). Never generate incomplete stubs.
+- Implement exactly ONE Atomic Task per turn (with 1:1 UI Prototype Parity for `SCR-<MOD>-<NN>` tasks and `/ntc-cr` Delta Change Request handling). Never generate incomplete stubs.
 - Update the `🎫 Resume Ticket`, run `python scripts/validate_plans.py --fix`, and create an Atomic Git Commit checkpoint before concluding any turn.
 <!-- HARNESS:END -->
 EOF
@@ -127,12 +143,13 @@ done
 
 echo ""
 echo "=========================================================="
-echo " SUCCESS: NTC Micro Harness v2.0 installed successfully!"
+echo " SUCCESS: NTC Micro Harness v2.1 (Plugin Edition) installed!"
 echo "=========================================================="
-echo "Next Steps:"
-echo "  1. Draft requirements at SPEC.md using docs/templates/spec-template.md."
-echo "  2. Start your AI Agent (Antigravity, Claude Code, Cursor, Windsurf) and prompt:"
-echo '     "Read SPEC.md and AGENTS.md to perform Gate 1 & Gate 2."'
-echo "  3. Validate and auto-sync planning documents at any time using:"
-echo "     python scripts/validate_plans.py --fix"
+echo "Start your project with the 6-Step /ntc-* Slash Commands:"
+echo "  1. /ntc-init       -> Connect Git repo (optional) + Q&A -> PRD.md & ARCHITECTURE.md"
+echo "  2. /ntc-prototype  -> Build & approve interactive HTML UI Prototypes (SCR-<MOD>-<NN>)"
+echo "  3. /ntc-spec       -> Lock overall SPEC.md + Roadmap + Contracts + ai-skill-maps.md"
+echo "  4. /ntc-modules    -> Author detailed docs/modules-spec/<slug>.md + STEP-by-STEP.md"
+echo "  5. /ntc-plan       -> Pre-generate all Phase Dossiers & Level-4 Atomic WBS"
+echo "  6. /ntc-run        -> Execute 1 Atomic Task per turn + 1:1 UI Parity + Auto Git Commit"
 echo ""

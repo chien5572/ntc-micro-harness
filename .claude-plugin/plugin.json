@@ -1,0 +1,12 @@
+{
+  "name": "ntc-micro-harness",
+  "displayName": "NTC Micro-Harness (Atomic Engineering v2.1)",
+  "description": "6-Step Atomic Engineering Plugin (/ntc-init, /ntc-prototype, /ntc-spec, /ntc-modules, /ntc-plan, /ntc-run, /ntc-cr, /ntc-status) with Git remote setup, interactive PRD/Architecture discovery, 1:1 HTML UI prototyping, skill-guided module specs, and atomic git commit checkpointing.",
+  "version": "2.1.0",
+  "author": {
+    "name": "NTC Engineering (chien5572)",
+    "url": "https://github.com/chien5572/ntc-micro-harness"
+  },
+  "repository": "https://github.com/chien5572/ntc-micro-harness",
+  "logo": "../assets/logo.svg"
+}
