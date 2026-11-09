@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""NTC Micro Harness v2.1 (Plugin Edition) - Automated Project & Plugin Installer.
+"""NTC Micro-Harness v2.1 (Plugin Edition) - Automated Project & Antigravity Plugin Installer.
 
-Installs the 6-Step Atomic Engineering Protocol & `/ntc-*` Plugin Skills into any
-target software project, and optionally installs the global Antigravity plugin at
-`~/.gemini/config/plugins/ntc-micro-harness/`.
+Installs the 6-Step Atomic Engineering Protocol & `/ntc-*` Plugin into:
+  1. Global Antigravity Plugin directory (`~/.gemini/config/plugins/ntc-micro-harness/`)
+     for Antigravity 2.0, Antigravity IDE, and Antigravity CLI (`agy`).
+  2. Target project workspace (`AGENTS.md`, `docs/`, `scripts/validate_plans.py`,
+     `.agents/skills/ntc-*/SKILL.md`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules`).
 """
 
 from __future__ import annotations
@@ -72,7 +74,7 @@ Adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md`
 
 def fetch_remote_harness(temp_dir: Path) -> Path:
     """Downloads the harness repository into temp_dir via git or HTTPS zip archive."""
-    print(f"[*] Fetching NTC Micro Harness v{HARNESS_VERSION} from {REPO_GIT_URL} ...")
+    print(f"[*] Fetching NTC Micro-Harness v{HARNESS_VERSION} from {REPO_GIT_URL} ...")
     clone_target = temp_dir / "ntc-micro-harness"
     try:
         subprocess.run(
@@ -90,7 +92,7 @@ def fetch_remote_harness(temp_dir: Path) -> Path:
             zf.extractall(temp_dir)
         extracted_dirs = [p for p in temp_dir.iterdir() if p.is_dir() and (p / "AGENTS.md").exists()]
         if not extracted_dirs:
-            raise RuntimeError("Failed to download and extract NTC Micro Harness archive.")
+            raise RuntimeError("Failed to download and extract NTC Micro-Harness archive.")
         return extracted_dirs[0]
 
 
@@ -122,7 +124,7 @@ def install_global_plugin(source_root: Path, plugin_dir: Path | None = None) -> 
     dst_plugin = plugin_dir or (Path.home() / ".gemini" / "config" / "plugins" / "ntc-micro-harness")
     dst_plugin.mkdir(parents=True, exist_ok=True)
 
-    for item in ["plugin.json", ".claude-plugin/plugin.json", "assets/logo.svg", "rules/AGENTS.md"]:
+    for item in ["plugin.json", ".claude-plugin/plugin.json", "assets/logo.svg", "rules/AGENTS.md", "README.md", "README.vi.md"]:
         s_file = source_root / item
         d_file = dst_plugin / item
         if s_file.exists():
@@ -136,7 +138,7 @@ def install_global_plugin(source_root: Path, plugin_dir: Path | None = None) -> 
             d_skill.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(s_skill, d_skill)
 
-    print(f"  [+] Installed global plugin bundle at: {dst_plugin}")
+    print(f"  [+] Installed Global Antigravity Plugin (2.0 / IDE / CLI) at: {dst_plugin}")
     return dst_plugin
 
 
@@ -146,11 +148,21 @@ def install_harness(
     agent_rules: list[str] | None = None,
     force: bool = False,
     repo_url: str | None = None,
-    install_plugin: bool = False,
+    install_plugin: bool = True,
+    plugin_only: bool = False,
 ) -> None:
-    """Installs the NTC Micro Harness files and /ntc-* skills into the target project root."""
+    """Installs the NTC Micro-Harness plugin and/or workspace files."""
+    if plugin_only:
+        print(f"[*] Installing NTC Micro-Harness v{HARNESS_VERSION} Global Plugin for Antigravity (2.0, IDE, CLI)...")
+        install_global_plugin(source_root)
+        print("\n" + "=" * 68)
+        print(f"SUCCESS: NTC Micro-Harness v{HARNESS_VERSION} Global Plugin installed!")
+        print("=" * 68)
+        print("Restart Antigravity 2.0 / Antigravity IDE / `agy` CLI to activate `/ntc-*` commands.\n")
+        return
+
     target_root = target_root.resolve()
-    print(f"[*] Installing NTC Micro Harness v{HARNESS_VERSION} into: {target_root}")
+    print(f"[*] Installing NTC Micro-Harness v{HARNESS_VERSION} into: {target_root}")
 
     if not target_root.exists():
         target_root.mkdir(parents=True, exist_ok=True)
@@ -243,7 +255,7 @@ def install_harness(
                 shutil.copy2(s_skill, d_skill)
                 print(f"  [+] Installed slash skill /{skill_name} -> {d_skill.relative_to(target_root)}")
 
-    # 5. Optional global plugin installation (~/.gemini/config/plugins/ntc-micro-harness)
+    # 5. Global Antigravity plugin installation (~/.gemini/config/plugins/ntc-micro-harness)
     if install_plugin:
         install_global_plugin(source_root)
 
@@ -266,7 +278,7 @@ def install_harness(
                         print(f"  [+] Appended harness rule to: {rule_file}")
 
     print("\n" + "=" * 68)
-    print(f"SUCCESS: NTC Micro Harness v{HARNESS_VERSION} (Plugin Edition) installed!")
+    print(f"SUCCESS: NTC Micro-Harness v{HARNESS_VERSION} (Plugin Edition) installed!")
     print("=" * 68)
     print("6-Step /ntc-* Slash Command Workflow:")
     print("  1. /ntc-init       -> Connect Git remote repo (optional) + Q&A -> PRD.md & ARCHITECTURE.md")
@@ -281,7 +293,7 @@ def install_harness(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Install NTC Micro Harness v2.1 (Plugin Edition) into any software repository.",
+        description="Install NTC Micro-Harness v2.1 (Plugin Edition) into Antigravity (2.0, IDE, CLI) and/or a project workspace.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -302,7 +314,18 @@ def main() -> None:
         "--plugin",
         "-p",
         action="store_true",
-        help="Also install NTC Micro-Harness as a global plugin (~/.gemini/config/plugins/ntc-micro-harness)",
+        default=True,
+        help="Install NTC Micro-Harness as a global Antigravity plugin (~/.gemini/config/plugins/ntc-micro-harness)",
+    )
+    parser.add_argument(
+        "--no-plugin",
+        action="store_true",
+        help="Skip installing into the global Antigravity plugin directory",
+    )
+    parser.add_argument(
+        "--plugin-only",
+        action="store_true",
+        help="Only install the global Antigravity plugin (~/.gemini/config/plugins/ntc-micro-harness) without modifying current workspace",
     )
     parser.add_argument(
         "--agent",
@@ -321,6 +344,7 @@ def main() -> None:
 
     args = parser.parse_args()
     agent_selection = [] if "none" in args.agent else args.agent
+    do_plugin = False if args.no_plugin else args.plugin
 
     local_root = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
     if (local_root / "AGENTS.md").exists() and (local_root / "docs" / "WORKFLOW.md").exists():
@@ -330,7 +354,8 @@ def main() -> None:
             agent_rules=agent_selection,
             force=args.force,
             repo_url=args.repo,
-            install_plugin=args.plugin,
+            install_plugin=do_plugin,
+            plugin_only=args.plugin_only,
         )
     else:
         with tempfile.TemporaryDirectory(prefix="ntc-harness-") as tmp:
@@ -341,7 +366,8 @@ def main() -> None:
                 agent_rules=agent_selection,
                 force=args.force,
                 repo_url=args.repo,
-                install_plugin=args.plugin,
+                install_plugin=do_plugin,
+                plugin_only=args.plugin_only,
             )
 
 

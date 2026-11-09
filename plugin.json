@@ -7,20 +7,12 @@
     "name": "NTC Engineering (chien5572)",
     "url": "https://github.com/chien5572/ntc-micro-harness"
   },
+  "homepage": "https://github.com/chien5572/ntc-micro-harness",
   "repository": "https://github.com/chien5572/ntc-micro-harness",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
-    {
-      "title": "1. Khởi tạo Dự án (/ntc-init)",
-      "prompt": "/ntc-init Hãy kết nối Git repo dự án và đặt câu hỏi để cùng tôi xây dựng PRD.md và ARCHITECTURE.md."
-    },
-    {
-      "title": "2. Thiết kế UI Prototype (/ntc-prototype)",
-      "prompt": "/ntc-prototype Dựa vào PRD.md và ARCHITECTURE.md, hãy tạo các bản HTML UI Prototype tương tác có data-testid."
-    },
-    {
-      "title": "3. Thực thi Task Nguyên tử (/ntc-run)",
-      "prompt": "/ntc-run Tiếp tục thực thi Atomic Task tiếp theo, kiểm thử và tạo Git Commit checkpoint."
-    }
+    "/ntc-init Hãy kết nối Git repo dự án và đặt câu hỏi để cùng tôi xây dựng PRD.md và ARCHITECTURE.md",
+    "/ntc-prototype Dựa vào PRD.md và ARCHITECTURE.md, hãy tạo các bản HTML UI Prototype tương tác có data-testid",
+    "/ntc-run Tiếp tục thực thi Atomic Task tiếp theo, kiểm thử và tạo Git Commit checkpoint"
   ]
 }

@@ -9,15 +9,16 @@
 [![CI Validation](https://github.com/chien5572/ntc-micro-harness/actions/workflows/validate.yml/badge.svg)](https://github.com/chien5572/ntc-micro-harness/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Protocol Version](https://img.shields.io/badge/NTC%20Plugin-v2.1.0-green.svg)](plugin.json)
-[![Compatible with](https://img.shields.io/badge/AI%20Agents-Antigravity%20%7C%20Claude%20Code%20%7C%20Cursor%20%7C%20Windsurf-orange.svg)](AGENTS.md)
+[![Antigravity Ready](https://img.shields.io/badge/Google%20Antigravity-2.0%20%7C%20IDE%20%7C%20CLI%20(agy)-4285F4.svg)](plugin.json)
+[![Compatible with](https://img.shields.io/badge/AI%20Agents-Claude%20Code%20%7C%20Cursor%20%7C%20Windsurf-orange.svg)](AGENTS.md)
 
-**NTC Micro-Harness v2.1 (Plugin Edition)** là bộ khung kỷ luật kỹ thuật (Engineering Harness) kiêm **Plugin Slash Commands (`/ntc-*`)** chống trượt ngữ cảnh (zero-drift), tối ưu hóa token, được thiết kế chuyên biệt để lập trình cặp (pair-programming) và điều phối đa tác tử (multi-agent orchestration) với các AI Coding Agent hiện đại (**Google Antigravity**, **Anthropic Claude Code**, **Cursor**, **Windsurf**, và **Roo Code / Cline**).
+**NTC Micro-Harness v2.1 (Plugin Edition)** là bộ khung kỷ luật kỹ thuật (Engineering Harness) kiêm **Plugin Slash Commands (`/ntc-*`)** chống trượt ngữ cảnh (zero-drift), tối ưu hóa token, được thiết kế chuyên biệt cho hệ sinh thái **Google Antigravity** (**Antigravity 2.0**, **Antigravity IDE**, **Antigravity CLI `agy`**) cũng như **Claude Code**, **Cursor**, và **Windsurf**.
 
-Thay vì bắt bạn phải tự tay viết hàng chục trang tài liệu từ đầu hoặc để AI tự ý nhảy vào viết code chắp vá, **NTC Micro-Harness v2.1** dẫn dắt toàn bộ vòng đời dự án qua **6 Bước điều khiển bằng lệnh `/ntc-*` trực quan**:
-1. **Bước 1 (`/ntc-init`) — Kết nối Git Repo & Hỏi-Đáp tạo `PRD.md` + `ARCHITECTURE.md`:** Ngay khi khởi chạy, Agent hỏi link **Git Repo của dự án** (để kết nối `git remote origin` trước khi làm bất cứ việc gì — có thể để trống nếu làm local) và **ý tưởng cơ bản**. Sau đó Agent đặt 3–5 câu hỏi làm rõ để cùng bạn hoàn thiện và tự động sinh ra [`PRD.md`](docs/templates/prd-template.md) & [`ARCHITECTURE.md`](docs/templates/architecture-template.md).
-2. **Bước 2 (`/ntc-prototype`) — Tạo & Chốt UI Prototype từ `PRD` + `ARCHITECTURE` (nếu có UI):** Tạo các file HTML/CSS tương tác (`docs/prototypes/<slug>/scr-<nn>-*.html`) có đủ 4 trạng thái (`default`, `loading`, `empty`, `error`) và neo `data-testid`, chỉnh sửa (`--revise`) cho đến khi bạn hài lòng và chốt (`--approve` → `APPROVED`).
-3. **Bước 3 (`/ntc-spec`) — Chốt `SPEC.md` Tổng Quan & Gán AI Skills (`ai-skill-maps.md`):** Tổng hợp thành [`SPEC.md`](docs/templates/spec-template.md) tổng quan (kèm `system-roadmap.md` và `contract-registry.md`) để bạn duyệt. Ngay sau đó, dựa trên `SPEC.md`, Agent đề xuất và cài đặt các **AI Skills** tương ứng cho từng chức năng (module/service) vào `.agents/skills/` và lập file hướng dẫn sử dụng skills [`ai-skill-maps.md`](docs/templates/ai-skill-maps-template.md).
-4. **Bước 4 (`/ntc-modules`) — Tạo SPEC Chi Tiết Từng Module & `STEP-by-STEP.md`:** Dựa theo `SPEC.md` tổng quan, các **Skills** trong `ai-skill-maps.md` và `UI Prototypes` đã chốt, Agent viết bản đặc tả chi tiết [`docs/modules-spec/<slug>.md`](docs/templates/module-spec-template.md) cho từng chức năng (module/service). Khi bạn duyệt (`--approve`), hệ thống tự động sinh sổ tay [`STEP-by-STEP.md`](docs/templates/step-by-step-template.md).
+Thay vì bắt bạn phải tự tay viết hàng chục trang đặc tả từ con số 0 hoặc để AI tự ý nhảy vào viết code chắp vá, lệch giao diện, **NTC Micro-Harness v2.1** dẫn dắt toàn bộ vòng đời dự án qua **6 Bước điều khiển bằng các lệnh `/ntc-*` trực quan**:
+1. **Bước 1 (`/ntc-init`) — Kết nối Git Repo & Hỏi-Đáp tạo `PRD.md` + `ARCHITECTURE.md`:** Ngay khi khởi chạy, Agent hỏi **link Git Repo của dự án** (để khởi tạo `git init` và kết nối `git remote add origin <url>` trước khi làm bất cứ việc gì — có thể để trống nếu chỉ làm local) cùng **yêu cầu cơ bản**. Sau đó Agent đặt 3–5 câu hỏi làm rõ để cùng bạn hoàn thiện và sinh ra [`PRD.md`](docs/templates/prd-template.md) & [`ARCHITECTURE.md`](docs/templates/architecture-template.md).
+2. **Bước 2 (`/ntc-prototype`) — Tạo & Tinh chỉnh UI Prototype từ `PRD` + `ARCHITECTURE` (nếu có UI):** Sinh các file HTML/CSS tương tác tự chứa (`docs/prototypes/<slug>/scr-<nn>-*.html`) có đủ 4 trạng thái (`default`, `loading`, `empty`, `error`) và neo `data-testid`, chỉnh sửa (`--revise`) cho đến khi bạn hài lòng và chốt (`--approve` → `APPROVED`).
+3. **Bước 3 (`/ntc-spec`) — Chốt `SPEC.md` Tổng Quan & Gán AI Skills (`ai-skill-maps.md`):** Tổng hợp thành [`SPEC.md`](docs/templates/spec-template.md) tổng quan (kèm `system-roadmap.md` và `contract-registry.md`) để bạn xem và chốt. Ngay sau đó, dựa vào `SPEC.md`, Agent đề xuất và cài đặt các **AI Skills** tương ứng cho từng chức năng (module/service) vào `.agents/skills/` và lập file hướng dẫn sử dụng skills [`ai-skill-maps.md`](docs/templates/ai-skill-maps-template.md).
+4. **Bước 4 (`/ntc-modules`) — Tạo SPEC Chi Tiết Từng Chức Năng & `STEP-by-STEP.md`:** Dựa theo `SPEC.md` tổng quan, các **Skills** trong `ai-skill-maps.md` và `UI Prototypes` đã chốt, Agent viết bản đặc tả chi tiết [`docs/modules-spec/<slug>.md`](docs/templates/module-spec-template.md) cho từng chức năng (module/service). Khi bạn duyệt (`--approve`), hệ thống tự động sinh sổ tay [`STEP-by-STEP.md`](docs/templates/step-by-step-template.md).
 5. **Bước 5 (`/ntc-plan`) — Chia nhỏ WBS Cấp 4 Toàn Dự Án (Gate 4):** Sinh sẵn 100% Hồ sơ Pha (`docs/plans/active/<slug>/phase-<NN>-*.md`) với các Atomic Tasks cấp 4 cho mọi module trước khi viết bất kỳ dòng code nào.
 6. **Bước 6 (`/ntc-run` / `"tiếp tục"`) — Thực thi Nguyên tử, Auto Git Commit, `/ntc-cr` & Khóa Đuôi `SYS` E2E (Gate 5):** Thực thi đúng **1 Lượt = 1 Atomic Task**, ép khớp **1:1 UI Prototype (`data-testid`)**, chạy test thực tế, **tự động `git commit` tạo điểm lui (rollback point) sau mỗi task**, hỗ trợ yêu cầu thay đổi giữa chừng qua **`/ntc-cr`** (`CR-<NN>`), và khóa đuôi bằng kiểm thử tích hợp Full-Stack E2E (**`/ntc-status --e2e`**).
 
@@ -25,10 +26,14 @@ Thay vì bắt bạn phải tự tay viết hàng chục trang tài liệu từ 
 
 ## Mục Lục
 
-1. [Bảng Tổng Hợp Các Lệnh `/ntc-*` (Slash Commands) & Khi Nào Sử Dụng](#1-bảng-tổng-hợp-các-lệnh-ntc--slash-commands--khi-nào-sử-dụng)
-2. [Sơ Đồ Quy Trình 6 Bước Của Plugin NTC Micro-Harness v2.1](#2-sơ-đồ-quy-trình-6-bước-của-plugin-ntc-micro-harness-v21)
-3. [Hướng Dẫn Cài Đặt 1 Lệnh Duy Nhất (Dự Án & Global Plugin)](#3-hướng-dẫn-cài-đặt-1-lệnh-duy-nhất-dự-án--global-plugin)
-4. [Chi Tiết Cách Sử Dụng Từng Bước (`/ntc-init` → `/ntc-run`)](#4-chi-tiết-cách-sử-dụng-từng-bước-ntc-init--ntc-run)
+1. [Hướng Dẫn Cài Đặt Plugin Cho Antigravity (2.0, IDE & CLI `agy`)](#1-hướng-dẫn-cài-đặt-plugin-cho-antigravity-20-ide--cli-agy)
+   - [1.1 Cài đặt bằng Antigravity CLI (`agy`)](#11-cài-đặt-bằng-antigravity-cli-agy)
+   - [1.2 Cài đặt Global Plugin 1 Lệnh cho Antigravity 2.0, IDE & CLI](#12-cài-đặt-global-plugin-1-lệnh-cho-antigravity-20-ide--cli)
+   - [1.3 Cài đặt Đồng thời vào Dự án Hiện tại + Global Plugin (1-Liner)](#13-cài-đặt-đồng-thời-vào-dự-án-hiện-tại--global-plugin-1-liner)
+   - [1.4 Cách Kích hoạt & Sử dụng trên Antigravity 2.0, IDE và CLI](#14-cách-kích-hoạt--sử-dụng-trên-antigravity-20-ide-và-cli)
+2. [Bảng Tra Cứu Toàn Bộ Lệnh `/ntc-*` (Slash Commands) & Các Cờ (`--flags`)](#2-bảng-tra-cứu-toàn-bộ-lệnh-ntc--slash-commands--các-cờ---flags)
+3. [Sơ Đồ Quy Trình 6 Bước Của Plugin NTC Micro-Harness v2.1](#3-sơ-đồ-quy-trình-6-bước-của-plugin-ntc-micro-harness-v21)
+4. [Hướng Dẫn Thực Hành Chi Tiết Từng Bước (Bước 1 → Bước 6)](#4-hướng-dẫn-thực-hành-chi-tiết-từng-bước-bước-1--bước-6)
 5. [Cơ Chế Khóa 5 Lớp Ép AI Tuân Thủ 100% UI Prototype](#5-cơ-chế-khóa-5-lớp-ép-ai-tuân-thủ-100-ui-prototype)
 6. [Quản Lý Thay Đổi Giữa Chừng (`/ntc-cr`), Auto Git Commit & Khôi Phục Sự Cố](#6-quản-lý-thay-đổi-giữa-chừng-ntc-cr-auto-git-commit--khôi-phục-sự-cố)
 7. [Kiểm Thử Tích Hợp Liên Module & Full-Stack E2E (`/ntc-status --e2e`)](#7-kiểm-thử-tích-hợp-liên-module--full-stack-e2e-ntc-status---e2e)
@@ -36,9 +41,95 @@ Thay vì bắt bạn phải tự tay viết hàng chục trang tài liệu từ 
 
 ---
 
-## 1. Bảng Tổng Hợp Các Lệnh `/ntc-*` (Slash Commands) & Khi Nào Sử Dụng
+## 1. Hướng Dẫn Cài Đặt Plugin Cho Antigravity (2.0, IDE & CLI `agy`)
 
-Khi cài đặt **NTC Micro-Harness v2.1**, 8 lệnh `/ntc-*` dưới đây sẽ sẵn sàng trong IDE của bạn (thông qua `.agents/skills/ntc-*/SKILL.md` và Global Plugin `~/.gemini/config/plugins/ntc-micro-harness`):
+Hệ sinh thái **Google Antigravity** (bao gồm **Antigravity 2.0 Desktop App**, **Antigravity IDE**, và **Antigravity CLI `agy`**) dùng chung thư mục cấu hình Global Plugin tại `~/.gemini/config/plugins/ntc-micro-harness` và cấu hình Workspace tại `<project-root>/.agents/`. Bạn chỉ cần cài đặt **1 lần** là cả 3 môi trường đều nhận diện đầy đủ bộ lệnh `/ntc-*`.
+
+### 1.1 Cài đặt bằng Antigravity CLI (`agy`)
+
+Nếu máy bạn đã cài đặt **Antigravity CLI (`agy`)**, chạy lệnh sau trong Terminal:
+
+```bash
+# Cài đặt trực tiếp plugin từ GitHub
+agy plugin install https://github.com/chien5572/ntc-micro-harness.git
+
+# Đảm bảo plugin được bật (enabled)
+agy plugin enable ntc-micro-harness
+```
+
+---
+
+### 1.2 Cài đặt Global Plugin 1 Lệnh cho Antigravity 2.0, IDE & CLI
+
+Bạn có thể cài đặt trực tiếp gói `ntc-micro-harness` vào thư mục Global Plugin (`~/.gemini/config/plugins/ntc-micro-harness`) bằng `git clone` hoặc script `--plugin-only`:
+
+#### 🪟 Windows (PowerShell / CMD)
+```powershell
+# Cách A: Dùng Git Clone trực tiếp vào thư mục Global Plugin của Antigravity
+git clone https://github.com/chien5572/ntc-micro-harness.git "$HOME\.gemini\config\plugins\ntc-micro-harness"
+
+# Cách B: Dùng PowerShell 1-Liner (Chỉ cài Global Plugin)
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.ps1))) -PluginOnly"
+```
+
+#### 🍎 macOS / 🐧 Linux / WSL / Git Bash
+```bash
+# Cách A: Dùng Git Clone trực tiếp vào thư mục Global Plugin của Antigravity
+git clone https://github.com/chien5572/ntc-micro-harness.git ~/.gemini/config/plugins/ntc-micro-harness
+
+# Cách B: Dùng Bash 1-Liner (Chỉ cài Global Plugin)
+curl -fsSL https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.sh | bash -s -- --plugin-only
+```
+
+> **Lưu ý:** Sau khi cài mới thư mục Global Plugin lần đầu, hãy **khởi động lại (Restart)** Antigravity 2.0 / Antigravity IDE / `agy` để hệ thống nạp manifest [`plugin.json`](plugin.json).
+
+---
+
+### 1.3 Cài đặt Đồng thời vào Dự án Hiện tại + Global Plugin (1-Liner)
+
+Nếu bạn đang đứng tại thư mục dự án (`cd /duong-dan/du-an`) và muốn vừa cài **Global Plugin cho Antigravity (2.0, IDE, CLI)**, vừa khởi tạo luôn bộ khung thư mục (`AGENTS.md`, `docs/`, `scripts/validate_plans.py`, `.agents/skills/ntc-*/`) vào dự án đó, hãy chạy 1 dòng lệnh dưới đây:
+
+#### 🪟 Windows PowerShell / PowerShell Core
+```powershell
+irm https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.ps1 | iex
+```
+*(Nếu muốn truyền sẵn link Git Repo của dự án ngay khi cài)*:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -TargetPath "." -RepoUrl "https://github.com/user/my-project.git"
+```
+
+#### 🪟 Windows Command Prompt (CMD)
+```cmd
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.ps1 | iex"
+```
+
+#### 🍎 macOS / 🐧 Linux / WSL / Git Bash
+```bash
+curl -fsSL https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.sh | bash
+```
+
+#### 🐍 Lệnh Python Đa Nền Tảng (Windows / macOS / Linux)
+```bash
+# Chạy từ xa bằng 1 dòng lệnh:
+python -c "import urllib.request as u; exec(u.urlopen('https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.py').read().decode('utf-8'))"
+
+# Hoặc chạy từ file install.py kèm kết nối Git Repo dự án:
+python install.py --target . --repo https://github.com/user/my-project.git
+```
+
+---
+
+### 1.4 Cách Kích hoạt & Sử dụng trên Antigravity 2.0, IDE và CLI
+
+| Môi trường Antigravity | Cách kiểm tra & Quản lý Plugin | Cách gọi lệnh `/ntc-*` |
+| :--- | :--- | :--- |
+| **1. Antigravity 2.0 (Desktop App)** | Ở thanh bên trái (**Left-hand Sidebar**), bấm vào mục **Skills & Customizations** → tab **Plugins** để thấy thẻ **NTC Micro-Harness (Atomic Engineering v2.1)** kèm 3 nút gợi ý khởi đầu (`suggestedPrompts`). Bạn có thể bật/tắt (toggle) trực tiếp không cần restart. | Tại khung **Chat Canvas**, gõ dấu `/` để mở menu lệnh và chọn `/ntc-init`, `/ntc-prototype`, `/ntc-spec`, `/ntc-modules`, `/ntc-plan`, `/ntc-run`, `/ntc-cr`, `/ntc-status`. |
+| **2. Antigravity IDE (VS Code-based)** | IDE tự động nạp cả Global Plugin (`~/.gemini/config/plugins/ntc-micro-harness`) lẫn Workspace Skills (`.agents/skills/ntc-*/`). | Mở bảng **Sidebar Chat** (chế độ **Agent Mode**), gõ `/ntc-init` hoặc `/ntc-run` (hoặc gõ `"tiếp tục"`). |
+| **3. Antigravity CLI (`agy`)** | Mở terminal tại thư mục dự án và gõ `agy` để vào giao diện TUI. Có thể gõ `/help` để xem danh sách các lệnh `/` đã nạp. | Gõ trực tiếp `/ntc-init`, `/ntc-prototype`, `/ntc-spec`, `/ntc-modules`, `/ntc-plan`, `/ntc-run`, `/ntc-cr`, `/ntc-status` ngay trong khung nhắc của `agy`. |
+
+---
+
+## 2. Bảng Tra Cứu Toàn Bộ Lệnh `/ntc-*` (Slash Commands) & Các Cờ (`--flags`)
 
 | Bước | Lệnh `/ntc-*` | Các Cờ (`--flags`) Hỗ Trợ | Khi Nào Sử Dụng? | Cách Sử Dụng & Hành Động Của Agent |
 | :--- | :--- | :--- | :--- | :--- |
@@ -53,7 +144,7 @@ Khi cài đặt **NTC Micro-Harness v2.1**, 8 lệnh `/ntc-*` dưới đây sẽ
 
 ---
 
-## 2. Sơ Đồ Quy Trình 6 Bước Của Plugin NTC Micro-Harness v2.1
+## 3. Sơ Đồ Quy Trình 6 Bước Của Plugin NTC Micro-Harness v2.1
 
 ```mermaid
 flowchart TD
@@ -75,55 +166,20 @@ flowchart TD
     CR -. "Cập nhật Delta Prototype/Spec/WBS" .-> S6
 ```
 
-### Tại sao thứ tự `PRD & ARCH` → `Prototype` → `SPEC & Skills` → `Module Specs` lại tối ưu nhất?
-1. **Kết nối Git ngay từ giây đầu tiên (`/ntc-init`):** Đảm bảo mọi tài liệu kiến trúc và mọi Atomic Git Commit ở các bước sau đều gắn sẵn với kho lưu trữ Git (`origin`) của dự án.
-2. **Nhìn thấy giao diện trước khi khóa `SPEC.md` (`/ntc-prototype`):** Từ `PRD.md` và `ARCHITECTURE.md`, bạn được bấm thử trên HTML Prototype thật (`docs/prototypes/<slug>/scr-*.html`). Chỉnh sửa giao diện xong xuôi rồi mới đúc kết thành `SPEC.md` tổng quan sẽ giúp `SPEC.md` chính xác tuyệt đối, không phải sửa đi sửa lại.
-3. **Chọn Vũ khí (AI Skills) trước khi viết Thiết kế Chi tiết (`/ntc-spec` → `/ntc-modules`):** Khi chốt `SPEC.md` ở Bước 3, Agent biết rõ dự án gồm những chức năng (modules/services) nào để tìm và gán bộ Skills chuyên sâu vào `ai-skill-maps.md`. Nhờ đó, sang Bước 4 (`/ntc-modules`), Agent **đọc chính các Skills đó** để viết Schema DB, API Contract và kiến trúc chi tiết trong `docs/modules-spec/<slug>.md` chuẩn mực hơn gấp nhiều lần!
-
 ---
 
-## 3. Hướng Dẫn Cài Đặt 1 Lệnh Duy Nhất (Dự Án & Global Plugin)
+## 4. Hướng Dẫn Thực Hành Chi Tiết Từng Bước (Bước 1 → Bước 6)
 
-Mở Terminal tại thư mục dự án của bạn và chạy **1 dòng lệnh** tương ứng với hệ điều hành:
-
-### 3.1 Windows PowerShell / PowerShell Core
-```powershell
-# Cài đặt vào dự án hiện tại + Cài đặt Global Plugin cho Antigravity/Claude
-irm https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.ps1 | iex
-```
-*(Nếu đã clone repo về máy, chạy thêm `-InstallPlugin` và `-RepoUrl`)*:
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -TargetPath "D:\du-an-moi" -RepoUrl "https://github.com/user/du-an-moi.git" -InstallPlugin
-```
-
-### 3.2 Linux / macOS / WSL / Git Bash
-```bash
-curl -fsSL https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.sh | bash
-```
-
-### 3.3 Lệnh Python Đa Nền Tảng (Hỗ trợ cờ `--plugin` và `--repo`)
-```bash
-# Cài đặt từ xa bằng 1 dòng lệnh Python:
-python -c "import urllib.request as u; exec(u.urlopen('https://raw.githubusercontent.com/chien5572/ntc-micro-harness/main/install.py').read().decode('utf-8'))"
-
-# Hoặc chạy trực tiếp từ file install.py kèm kết nối Git Repo và cài Global Plugin:
-python install.py --target . --repo https://github.com/user/my-project.git --plugin
-```
-
----
-
-## 4. Chi Tiết Cách Sử Dụng Từng Bước (`/ntc-init` → `/ntc-run`)
-
-### Bước 1: Khởi tạo Git, Điền yêu cầu cơ bản & Hỏi-Đáp tạo `PRD.md` + `ARCHITECTURE.md` (`/ntc-init`)
-Trong khung chat của AI Agent, nhập:
+### Bước 1: Kết nối Git Repo, Điền yêu cầu cơ bản & Hỏi-Đáp tạo `PRD.md` + `ARCHITECTURE.md` (`/ntc-init`)
+Trong khung chat của **Antigravity 2.0**, **Antigravity IDE** hoặc **Antigravity CLI (`agy`)**, nhập:
 ```text
 /ntc-init
 ```
 *(Hoặc truyền trực tiếp: `/ntc-init --repo https://github.com/user/shop.git --idea "Hệ thống quản lý đơn hàng đa chi nhánh có Web Portal"`)*
 
 * **Việc Agent sẽ làm:**
-  1. Nếu bạn chưa nhập link Git repo, Agent sẽ hỏi bạn: **"Link Git Repo của dự án (có thể để trống nếu chỉ làm local)"** và **"Yêu cầu cơ bản của dự án"**.
-  2. Ngay khi bạn nhập, Agent chạy `git init` và kết nối `git remote add origin <repo-url>` **trước khi làm bất cứ việc gì khác**.
+  1. Nếu bạn chưa nhập link Git repo, Agent sẽ hỏi bạn đầu tiên: **"Link Git Repo của dự án (có thể để trống nếu chỉ làm local)"** và **"Yêu cầu cơ bản của dự án"**.
+  2. Ngay khi bạn phản hồi, Agent chạy `git init` và kết nối `git remote add origin <repo-url>` **trước khi làm bất cứ việc gì khác**.
   3. Agent đưa ra **3–5 câu hỏi ngắn gọn** để bạn làm rõ các điểm khuyết (phân quyền người dùng, luồng nghiệp vụ chính, công nghệ/DB muốn dùng, có giao diện UI hay không).
   4. Từ câu trả lời của bạn, Agent tạo ra 2 file nền tảng tại gốc dự án: **`PRD.md`** và **`ARCHITECTURE.md`**.
 
@@ -218,7 +274,7 @@ Khi bắt đầu code hoặc tiếp tục công việc, bạn chỉ cần gõ:
 1. **Lớp 1 — Khóa Sổ đăng ký & Design Tokens (`docs/prototypes/registry.md`):** Mọi màn hình đều có mã `SCR-<MOD>-<NN>` và bảng màu/typography cố định ngay từ Bước 2 (`/ntc-prototype`).
 2. **Lớp 2 — Khóa Neo Kiểm thử `data-testid`:** Mọi phần tử quan trọng trong file `.html` prototype bắt buộc gắn `data-testid="scr-<nn>-<element>"`.
 3. **Lớp 3 — Khóa Kiểm tra Tự động (`scripts/validate_plans.py`):** Chặn cứng nếu màn hình còn ở trạng thái `DRAFT`, thiếu file `.html` trên ổ đĩa, hoặc trong file `.html` không có `data-testid=`.
-4. **Lớp 4 — Khóa Quy tắc 1:1 trong `AGENTS.md` & Skill `ui-prototype-fidelity`:** Bắt buộc Agent `read_file` bản HTML prototype ngay trong lượt code để chuyển đổi 1:1 vào React/Vue/Next.js/ Blade/Flutter.
+4. **Lớp 4 — Khóa Quy tắc 1:1 trong `AGENTS.md` & Skill `ui-prototype-fidelity`:** Bắt buộc Agent `read_file` bản HTML prototype ngay trong lượt code để chuyển đổi 1:1 vào React/Vue/Next.js/Blade/Flutter.
 5. **Lớp 5 — Khóa Kiểm thử Component (Task `.3`) & Full-Stack E2E (`SYS-P<FINAL>`):** Bài test bắt buộc truy vấn đúng các neo `getByTestId('scr-...')` đã khóa.
 
 ---
@@ -260,13 +316,14 @@ Agent sẽ kích hoạt Pha đóng dự án **`SYS-P<FINAL>`** của module `SYS
 
 ```text
 your-project/
-├── plugin.json                                     # Manifest của Plugin NTC Micro-Harness v2.1
+├── plugin.json                                     # Manifest chuẩn Plugin cho Antigravity (2.0 / IDE / CLI)
 ├── PRD.md                                          # [Bước 1: /ntc-init] Tài liệu Yêu cầu Sản phẩm
 ├── ARCHITECTURE.md                                 # [Bước 1: /ntc-init] Bản thiết kế Kiến trúc & Topology
 ├── SPEC.md                                         # [Bước 3: /ntc-spec] Đặc tả Hệ thống Tổng quan Tối cao
 ├── ai-skill-maps.md                                # [Bước 3: /ntc-spec] Bản đồ Kỹ năng AI cho từng Module/Service
 ├── STEP-by-STEP.md                                 # [Bước 4: /ntc-modules] Sổ tay Hướng dẫn cho Người dùng (AI cấm đọc)
 ├── AGENTS.md                                       # Hợp đồng vận hành 6 bước bắt buộc cho AI Agent
+├── rules/AGENTS.md                                 # Quy tắc tự động nạp khi bật Plugin
 ├── skills/                                         # Bộ 8 Slash Command Skills (/ntc-init .. /ntc-status)
 ├── .agents/skills/                                 # Các kỹ năng AI đã cài đặt cho dự án
 ├── docs/

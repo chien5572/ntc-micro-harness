@@ -1,15 +1,18 @@
 <#
 .SYNOPSIS
-    Automated installation script for NTC Micro Harness v2.1 Plugin Edition (Windows PowerShell / PowerShell Core).
+    Automated installation script for NTC Micro-Harness v2.1 Plugin Edition (Windows PowerShell / PowerShell Core).
 .DESCRIPTION
-    Installs the 6-Step Atomic Engineering Protocol & `/ntc-*` Plugin Skills into the current or specified project,
-    and optionally installs the global Antigravity plugin at `~/.gemini/config/plugins/ntc-micro-harness`.
+    Installs the 6-Step Atomic Engineering Protocol & `/ntc-*` Plugin into:
+      1. Global Antigravity Plugin directory (`~/.gemini/config/plugins/ntc-micro-harness`) for Antigravity 2.0, IDE, and CLI (`agy`).
+      2. Target project workspace (`.` by default).
 .PARAMETER TargetPath
     Path to the target project directory. Defaults to current directory (`.`).
 .PARAMETER RepoUrl
     Optional Git remote repository URL to connect (`origin`) right up front.
-.PARAMETER InstallPlugin
-    Also install NTC Micro-Harness as a global plugin (`~/.gemini/config/plugins/ntc-micro-harness`).
+.PARAMETER PluginOnly
+    Only install the global Antigravity plugin (`~/.gemini/config/plugins/ntc-micro-harness`) without modifying the current folder.
+.PARAMETER NoPlugin
+    Skip installing the global Antigravity plugin.
 .PARAMETER AgentRules
     Configure agent rule files: 'all', 'claude', 'cursor', 'windsurf', 'none'. Default is 'all'.
 .PARAMETER Force
@@ -24,7 +27,10 @@ param(
     [string]$RepoUrl = "",
 
     [Parameter()]
-    [switch]$InstallPlugin,
+    [switch]$PluginOnly,
+
+    [Parameter()]
+    [switch]$NoPlugin,
 
     [Parameter()]
     [string[]]$AgentRules = @("all"),
@@ -36,15 +42,38 @@ param(
 $ErrorActionPreference = "Stop"
 $RepoGitUrl = "https://github.com/chien5572/ntc-micro-harness.git"
 $RepoZipUrl = "https://github.com/chien5572/ntc-micro-harness/archive/refs/heads/main.zip"
+$ntcSkills = @("ntc-init", "ntc-prototype", "ntc-spec", "ntc-modules", "ntc-plan", "ntc-run", "ntc-cr", "ntc-status")
 
 $tempExtractDir = $null
 $sourceRoot = $PSScriptRoot
+
+function Install-GlobalAntigravityPlugin([string]$srcRoot) {
+    $globalPluginDir = Join-Path $HOME ".gemini\config\plugins\ntc-micro-harness"
+    New-Item -ItemType Directory -Path $globalPluginDir -Force | Out-Null
+    foreach ($pFile in @("plugin.json", ".claude-plugin\plugin.json", "assets\logo.svg", "rules\AGENTS.md", "README.md", "README.vi.md")) {
+        $sP = Join-Path $srcRoot $pFile
+        $dP = Join-Path $globalPluginDir $pFile
+        if (Test-Path $sP) {
+            New-Item -ItemType Directory -Path (Split-Path $dP -Parent) -Force | Out-Null
+            Copy-Item -Path $sP -Destination $dP -Force
+        }
+    }
+    foreach ($skill in $ntcSkills) {
+        $sS = Join-Path $srcRoot "skills\$skill\SKILL.md"
+        $dS = Join-Path $globalPluginDir "skills\$skill\SKILL.md"
+        if (Test-Path $sS) {
+            New-Item -ItemType Directory -Path (Split-Path $dS -Parent) -Force | Out-Null
+            Copy-Item -Path $sS -Destination $dS -Force
+        }
+    }
+    Write-Host "  [+] Installed Global Antigravity Plugin (2.0 / IDE / CLI) at: $globalPluginDir" -ForegroundColor Green
+}
 
 try {
     if ([string]::IsNullOrWhiteSpace($sourceRoot) -or -not (Test-Path (Join-Path $sourceRoot "AGENTS.md")) -or -not (Test-Path (Join-Path $sourceRoot "docs\WORKFLOW.md"))) {
         $tempExtractDir = Join-Path ([System.IO.Path]::GetTempPath()) ("ntc-harness-" + [Guid]::NewGuid().ToString("N"))
         New-Item -ItemType Directory -Path $tempExtractDir -Force | Out-Null
-        Write-Host "[*] Fetching NTC Micro Harness v2.1 from $RepoGitUrl ..." -ForegroundColor Cyan
+        Write-Host "[*] Fetching NTC Micro-Harness v2.1 from $RepoGitUrl ..." -ForegroundColor Cyan
 
         $gitCmd = Get-Command git -ErrorAction SilentlyContinue
         if ($gitCmd) {
@@ -57,10 +86,19 @@ try {
             Expand-Archive -Path $zipPath -DestinationPath $tempExtractDir -Force
             $extracted = Get-ChildItem -Path $tempExtractDir -Directory | Where-Object { Test-Path (Join-Path $_.FullName "AGENTS.md") } | Select-Object -First 1
             if (-not $extracted) {
-                throw "Failed to extract NTC Micro Harness archive."
+                throw "Failed to extract NTC Micro-Harness archive."
             }
             $sourceRoot = $extracted.FullName
         }
+    }
+
+    if ($PluginOnly) {
+        Write-Host "==========================================================" -ForegroundColor Cyan
+        Write-Host " Installing NTC Micro-Harness v2.1 Global Plugin Only" -ForegroundColor Cyan
+        Write-Host "==========================================================" -ForegroundColor Cyan
+        Install-GlobalAntigravityPlugin -srcRoot $sourceRoot
+        Write-Host "`nSUCCESS: Restart Antigravity 2.0 / Antigravity IDE / agy CLI to use /ntc-* commands.`n" -ForegroundColor Green
+        return
     }
 
     $resolvedTarget = (Resolve-Path -Path $TargetPath -ErrorAction SilentlyContinue)
@@ -71,7 +109,7 @@ try {
     $targetPath = $resolvedTarget.Path
 
     Write-Host "==========================================================" -ForegroundColor Cyan
-    Write-Host " Installing NTC Micro Harness v2.1 into: $targetPath" -ForegroundColor Cyan
+    Write-Host " Installing NTC Micro-Harness v2.1 into: $targetPath" -ForegroundColor Cyan
     Write-Host "==========================================================" -ForegroundColor Cyan
 
     # 0. Optional Git Repo Connection
@@ -174,7 +212,6 @@ try {
     }
 
     # 4. Copy /ntc-* Slash Command Skills into workspace (.agents/skills/)
-    $ntcSkills = @("ntc-init", "ntc-prototype", "ntc-spec", "ntc-modules", "ntc-plan", "ntc-run", "ntc-cr", "ntc-status")
     foreach ($skill in $ntcSkills) {
         $srcSkill = Join-Path $sourceRoot "skills\$skill\SKILL.md"
         $dstSkill = Join-Path $targetPath ".agents\skills\$skill\SKILL.md"
@@ -190,27 +227,9 @@ try {
         }
     }
 
-    # 5. Optional Global Plugin Installation (~/.gemini/config/plugins/ntc-micro-harness)
-    if ($InstallPlugin) {
-        $globalPluginDir = Join-Path $HOME ".gemini\config\plugins\ntc-micro-harness"
-        New-Item -ItemType Directory -Path $globalPluginDir -Force | Out-Null
-        foreach ($pFile in @("plugin.json", ".claude-plugin\plugin.json", "assets\logo.svg", "rules\AGENTS.md")) {
-            $sP = Join-Path $sourceRoot $pFile
-            $dP = Join-Path $globalPluginDir $pFile
-            if (Test-Path $sP) {
-                New-Item -ItemType Directory -Path (Split-Path $dP -Parent) -Force | Out-Null
-                Copy-Item -Path $sP -Destination $dP -Force
-            }
-        }
-        foreach ($skill in $ntcSkills) {
-            $sS = Join-Path $sourceRoot "skills\$skill\SKILL.md"
-            $dS = Join-Path $globalPluginDir "skills\$skill\SKILL.md"
-            if (Test-Path $sS) {
-                New-Item -ItemType Directory -Path (Split-Path $dS -Parent) -Force | Out-Null
-                Copy-Item -Path $sS -Destination $dS -Force
-            }
-        }
-        Write-Host "  [+] Installed global plugin at: $globalPluginDir" -ForegroundColor Green
+    # 5. Global Antigravity Plugin Installation (~/.gemini/config/plugins/ntc-micro-harness)
+    if (-not $NoPlugin) {
+        Install-GlobalAntigravityPlugin -srcRoot $sourceRoot
     }
 
     # 6. Agent rule integrations
@@ -270,7 +289,7 @@ Adhere strictly to the 6-Step Atomic Engineering Protocol defined in `AGENTS.md`
     }
 
     Write-Host "`n==========================================================" -ForegroundColor Cyan
-    Write-Host " SUCCESS: NTC Micro Harness v2.1 (Plugin Edition) installed!" -ForegroundColor Cyan
+    Write-Host " SUCCESS: NTC Micro-Harness v2.1 (Plugin Edition) installed!" -ForegroundColor Cyan
     Write-Host "==========================================================" -ForegroundColor Cyan
     Write-Host "Start your project with the 6-Step /ntc-* Slash Commands:" -ForegroundColor White
     Write-Host "  1. /ntc-init       -> Connect Git repo (optional) + Q&A -> PRD.md & ARCHITECTURE.md" -ForegroundColor Yellow

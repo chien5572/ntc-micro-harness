@@ -1,13 +1,32 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# NTC Micro Harness v2.1 (Plugin Edition) - Automated Bash Installer
-# Supports both local execution and remote 1-liner execution (`curl -fsSL ... | bash`)
+# NTC Micro-Harness v2.1 (Plugin Edition) - Automated Bash Installer
+# Installs into Global Antigravity Plugin (~/.gemini/config/plugins/ntc-micro-harness)
+# for Antigravity 2.0, Antigravity IDE, and Antigravity CLI (`agy`), plus target workspace.
 # ==============================================================================
 set -euo pipefail
 
-TARGET_DIR="${1:-.}"
+PLUGIN_ONLY=0
+NO_PLUGIN=0
+TARGET_DIR="."
+
+for arg in "$@"; do
+    case "$arg" in
+        --plugin-only)
+            PLUGIN_ONLY=1
+            ;;
+        --no-plugin)
+            NO_PLUGIN=1
+            ;;
+        *)
+            TARGET_DIR="$arg"
+            ;;
+    esac
+done
+
 REPO_GIT_URL="https://github.com/chien5572/ntc-micro-harness.git"
 REPO_TAR_URL="https://github.com/chien5572/ntc-micro-harness/archive/refs/heads/main.tar.gz"
+NTC_SKILLS=("ntc-init" "ntc-prototype" "ntc-spec" "ntc-modules" "ntc-plan" "ntc-run" "ntc-cr" "ntc-status")
 
 TMP_DIR=""
 cleanup() {
@@ -26,7 +45,7 @@ if [ -n "${SCRIPT_DIR}" ] && [ -f "${SCRIPT_DIR}/AGENTS.md" ] && [ -f "${SCRIPT_
     SOURCE_DIR="${SCRIPT_DIR}"
 else
     TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'ntc-harness')"
-    echo "[*] Fetching NTC Micro Harness v2.1 from ${REPO_GIT_URL} ..."
+    echo "[*] Fetching NTC Micro-Harness v2.1 from ${REPO_GIT_URL} ..."
     if command -v git >/dev/null 2>&1; then
         git clone --depth 1 --quiet "${REPO_GIT_URL}" "${TMP_DIR}/repo"
         SOURCE_DIR="${TMP_DIR}/repo"
@@ -36,11 +55,39 @@ else
     fi
 fi
 
+install_global_plugin() {
+    local GLOBAL_PLUGIN_DIR="${HOME}/.gemini/config/plugins/ntc-micro-harness"
+    mkdir -p "${GLOBAL_PLUGIN_DIR}"
+    for pfile in "plugin.json" ".claude-plugin/plugin.json" "assets/logo.svg" "rules/AGENTS.md" "README.md" "README.vi.md"; do
+        if [ -f "${SOURCE_DIR}/${pfile}" ]; then
+            mkdir -p "$(dirname "${GLOBAL_PLUGIN_DIR}/${pfile}")"
+            cp "${SOURCE_DIR}/${pfile}" "${GLOBAL_PLUGIN_DIR}/${pfile}"
+        fi
+    done
+    for skill in "${NTC_SKILLS[@]}"; do
+        if [ -f "${SOURCE_DIR}/skills/${skill}/SKILL.md" ]; then
+            mkdir -p "${GLOBAL_PLUGIN_DIR}/skills/${skill}"
+            cp "${SOURCE_DIR}/skills/${skill}/SKILL.md" "${GLOBAL_PLUGIN_DIR}/skills/${skill}/SKILL.md"
+        fi
+    done
+    echo "  [+] Installed Global Antigravity Plugin (2.0 / IDE / CLI) at: ${GLOBAL_PLUGIN_DIR}"
+}
+
+if [ "${PLUGIN_ONLY}" -eq 1 ]; then
+    echo "=========================================================="
+    echo " Installing NTC Micro-Harness v2.1 Global Plugin Only"
+    echo "=========================================================="
+    install_global_plugin
+    echo ""
+    echo "SUCCESS: Restart Antigravity 2.0 / Antigravity IDE / agy CLI to use /ntc-* commands."
+    exit 0
+fi
+
 mkdir -p "${TARGET_DIR}"
 TARGET_DIR="$(cd "${TARGET_DIR}" && pwd)"
 
 echo "=========================================================="
-echo " Installing NTC Micro Harness v2.1 into: ${TARGET_DIR}"
+echo " Installing NTC Micro-Harness v2.1 into: ${TARGET_DIR}"
 echo "=========================================================="
 
 # 1. Install or update AGENTS.md
@@ -110,7 +157,6 @@ if [ -f "${SOURCE_DIR}/scripts/validate_plans.py" ]; then
 fi
 
 # 4. Install /ntc-* Slash Command Skills into workspace (.agents/skills/)
-NTC_SKILLS=("ntc-init" "ntc-prototype" "ntc-spec" "ntc-modules" "ntc-plan" "ntc-run" "ntc-cr" "ntc-status")
 for skill in "${NTC_SKILLS[@]}"; do
     SRC_SKILL="${SOURCE_DIR}/skills/${skill}/SKILL.md"
     DST_SKILL="${TARGET_DIR}/.agents/skills/${skill}/SKILL.md"
@@ -123,7 +169,12 @@ for skill in "${NTC_SKILLS[@]}"; do
     fi
 done
 
-# 5. Agent rule files
+# 5. Install Global Antigravity Plugin (~/.gemini/config/plugins/ntc-micro-harness)
+if [ "${NO_PLUGIN}" -eq 0 ]; then
+    install_global_plugin
+fi
+
+# 6. Agent rule files
 AGENT_FILES=(".cursorrules" "CLAUDE.md" ".windsurfrules")
 for rule_file in "${AGENT_FILES[@]}"; do
     DST_RULE="${TARGET_DIR}/${rule_file}"
@@ -143,7 +194,7 @@ done
 
 echo ""
 echo "=========================================================="
-echo " SUCCESS: NTC Micro Harness v2.1 (Plugin Edition) installed!"
+echo " SUCCESS: NTC Micro-Harness v2.1 (Plugin Edition) installed!"
 echo "=========================================================="
 echo "Start your project with the 6-Step /ntc-* Slash Commands:"
 echo "  1. /ntc-init       -> Connect Git repo (optional) + Q&A -> PRD.md & ARCHITECTURE.md"
